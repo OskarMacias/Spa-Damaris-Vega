@@ -1,0 +1,17 @@
+{
+  "name": "Spa de Damaris Vega",
+  "short_name": "Spa Damaris",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "background_color": "#FEF3C7",
+  "theme_color": "#F59E0B",
+  "description": "Aplicación de gestión de citas y servicios para el Spa de Damaris Vega",
+  "icons": [
+    {
+      "src": "https://cdn-icons-png.flaticon.com/512/3175/3175155.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}
