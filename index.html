@@ -13,21 +13,29 @@
     
     body {
       font-family: 'Plus Jakarta Sans', sans-serif;
-      background-color: #FDFBF7;
+      background: linear-gradient(to bottom, rgba(253, 251, 247, 0.92), rgba(254, 243, 199, 0.95)), 
+                  url('https://images.unsplash.com/photo-1540555700478-4be289fbecef?auto=format&fit=crop&w=1920&q=80') center/cover fixed no-repeat;
       color: #3B3322;
+      min-height: 100vh;
     }
     
     .font-serif-title {
       font-family: 'Playfair Display', serif;
     }
 
-    /* Fondo elegante de Spa con overlay sutil */
+    /* Fondo principal del encabezado */
     .spa-hero-bg {
-      background: linear-gradient(to right, rgba(254, 240, 138, 0.85), rgba(254, 252, 232, 0.75)), 
+      background: linear-gradient(to right, rgba(254, 240, 138, 0.88), rgba(253, 230, 138, 0.85)), 
                   url('https://images.unsplash.com/photo-1544161515-4ab6ce6db874?auto=format&fit=crop&w=1600&q=80') center/cover no-repeat;
     }
 
-    /* Scrollbar personalizable estilo dorado/girasol */
+    /* Tarjeta de estado vacío con imagen relajante */
+    .empty-state-bg {
+      background: linear-gradient(to bottom, rgba(255, 255, 255, 0.88), rgba(254, 243, 199, 0.92)),
+                  url('https://images.unsplash.com/photo-1600334089648-b0d9d3028eb2?auto=format&fit=crop&w=800&q=80') center/cover no-repeat;
+    }
+
+    /* Scrollbar con estilo girasol */
     ::-webkit-scrollbar {
       width: 6px;
       height: 6px;
@@ -47,20 +55,20 @@
 <body class="min-h-screen flex flex-col antialiased selection:bg-amber-200 selection:text-amber-950">
 
   <!-- TOP HEADER CON ESTILO GIRASOL Y SPA -->
-  <header class="bg-amber-400 text-stone-900 border-b-2 border-amber-500 shadow-md sticky top-0 z-30">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-24 flex items-center justify-between">
+  <header class="bg-amber-400 text-stone-900 border-b-2 border-amber-500 shadow-lg sticky top-0 z-30">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between">
       
       <div class="flex items-center space-x-3">
         <!-- Icono Girasol -->
-        <div class="w-13 h-13 rounded-full bg-yellow-300 border-2 border-amber-600 flex items-center justify-center text-amber-900 shadow-md p-2">
-          <i data-lucide="sun" class="w-8 h-8 text-amber-700 animate-spin-slow"></i>
+        <div class="w-12 h-12 rounded-full bg-yellow-300 border-2 border-amber-600 flex items-center justify-center text-amber-900 shadow-md p-1.5">
+          <i data-lucide="sun" class="w-7 h-7 text-amber-700 animate-spin-slow"></i>
         </div>
         <div>
-          <h1 class="text-2xl md:text-3xl font-bold font-serif-title tracking-wide text-amber-950 flex items-center gap-2">
+          <h1 class="text-xl md:text-2xl font-bold font-serif-title tracking-wide text-amber-950 flex items-center gap-2">
             Spa de Damaris Vega
-            <span class="text-xl">🌻</span>
+            <span class="text-lg">🌻</span>
           </h1>
-          <p class="text-xs font-semibold tracking-wider uppercase text-amber-900">Salud • Masajes • Relajación & Estética</p>
+          <p class="text-[11px] font-semibold tracking-wider uppercase text-amber-900">Salud • Masajes • Relajación & Estética</p>
         </div>
       </div>
 
@@ -72,7 +80,7 @@
         </div>
         
         <!-- Insignia Alerta de Hoy -->
-        <div id="todayAlertBadge" class="flex items-center space-x-2 px-4 py-1.5 rounded-full text-xs font-bold bg-amber-100 text-amber-950 border border-amber-400 shadow-sm transition-all">
+        <div id="todayAlertBadge" class="flex items-center space-x-2 px-3.5 py-1.5 rounded-full text-xs font-bold bg-amber-100 text-amber-950 border border-amber-400 shadow-sm transition-all">
           <span class="w-2.5 h-2.5 rounded-full bg-amber-600 animate-ping"></span>
           <span id="todayAlertCount">Cargando citas...</span>
         </div>
@@ -82,13 +90,13 @@
   </header>
 
   <!-- BANNER ENCABEZADO CON IMAGEN DE FONDO RELAJANTE -->
-  <div class="spa-hero-bg border-b border-amber-200 py-8 px-4 text-center">
+  <div class="spa-hero-bg border-b border-amber-300 py-8 px-4 text-center shadow-inner">
     <div class="max-w-3xl mx-auto space-y-2">
-      <div class="inline-flex items-center space-x-2 bg-yellow-400/80 text-amber-950 px-3 py-1 rounded-full text-xs font-bold border border-yellow-500 shadow-sm">
+      <div class="inline-flex items-center space-x-2 bg-yellow-400/90 text-amber-950 px-3 py-1 rounded-full text-xs font-bold border border-yellow-500 shadow-sm">
         <span>🌻 Centro Holístico & Spa</span>
       </div>
-      <h2 class="text-3xl md:text-4xl font-serif-title font-bold text-amber-950">Espacio de Relajación & Armonía</h2>
-      <p class="text-sm font-medium text-amber-900">Gestiona las citas de masajes, corporales y faciales con un toque radiante como el girasol.</p>
+      <h2 class="text-3xl md:text-4xl font-serif-title font-bold text-amber-950 drop-shadow-sm">Espacio de Relajación & Armonía</h2>
+      <p class="text-xs md:text-sm font-semibold text-amber-950">Gestiona las citas de masajes, corporales y faciales con un ambiente cálido y radiante.</p>
     </div>
   </div>
 
@@ -96,7 +104,7 @@
   <div id="alertBanner" class="bg-gradient-to-r from-amber-500 via-yellow-500 to-amber-600 text-amber-950 shadow-md">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3 flex flex-col md:flex-row items-center justify-between gap-3">
       <div class="flex items-center space-x-3">
-        <div class="p-2 bg-yellow-200/60 rounded-lg">
+        <div class="p-2 bg-yellow-200/70 rounded-lg">
           <i data-lucide="bell-ring" class="w-6 h-6 text-amber-950 animate-bounce"></i>
         </div>
         <div>
@@ -117,12 +125,12 @@
   <main class="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-6">
 
     <!-- PESTAÑAS DE NAVEGACIÓN -->
-    <div class="flex flex-wrap gap-2 border-b border-amber-200 pb-2">
+    <div class="flex flex-wrap gap-2 border-b border-amber-300/70 pb-2">
       <button onclick="switchTab('appointments')" id="tab-appointments" class="tab-btn px-5 py-2.5 rounded-xl text-sm font-bold flex items-center space-x-2 transition-all bg-amber-500 text-amber-950 shadow-md border border-amber-600">
         <i data-lucide="calendar" class="w-4 h-4"></i>
         <span>Agendar y Citas</span>
       </button>
-      <button onclick="switchTab('services')" id="tab-services" class="tab-btn px-5 py-2.5 rounded-xl text-sm font-bold flex items-center space-x-2 transition-all text-amber-900 hover:bg-amber-200/60">
+      <button onclick="switchTab('services')" id="tab-services" class="tab-btn px-5 py-2.5 rounded-xl text-sm font-bold flex items-center space-x-2 transition-all text-amber-950 bg-yellow-100/70 hover:bg-amber-200 border border-amber-300">
         <i data-lucide="sparkles" class="w-4 h-4"></i>
         <span>Catálogo de Masajes & Servicios</span>
       </button>
@@ -133,7 +141,7 @@
       <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
 
         <!-- FORMULARIO DE NUEVA CITA -->
-        <div class="lg:col-span-4 bg-yellow-50/90 p-6 rounded-2xl border border-amber-300 shadow-md space-y-4">
+        <div class="lg:col-span-4 bg-yellow-50/95 backdrop-blur-md p-6 rounded-2xl border border-amber-300 shadow-xl space-y-4">
           <div class="flex items-center justify-between border-b border-amber-200 pb-3">
             <div class="flex items-center space-x-2">
               <i data-lucide="user-plus" class="w-5 h-5 text-amber-700"></i>
@@ -147,17 +155,17 @@
 
             <div>
               <label class="block text-xs font-bold text-amber-900 mb-1">Nombre Completo del Cliente *</label>
-              <input type="text" id="clientName" required placeholder="Ej. Ana Patricia Gómez" class="w-full px-3.5 py-2 rounded-xl border border-amber-300 text-sm focus:outline-none focus:ring-2 focus:ring-amber-500 bg-white">
+              <input type="text" id="clientName" required placeholder="Ej. Ana Patricia Gómez" class="w-full px-3.5 py-2 rounded-xl border border-amber-300 text-sm focus:outline-none focus:ring-2 focus:ring-amber-500 bg-white/90">
             </div>
 
             <div>
               <label class="block text-xs font-bold text-amber-900 mb-1">Teléfono WhatsApp (10 dígitos) *</label>
-              <input type="tel" id="clientPhone" required placeholder="Ej. 6671234567" pattern="[0-9]{10}" class="w-full px-3.5 py-2 rounded-xl border border-amber-300 text-sm focus:outline-none focus:ring-2 focus:ring-amber-500 bg-white">
+              <input type="tel" id="clientPhone" required placeholder="Ej. 6671234567" pattern="[0-9]{10}" class="w-full px-3.5 py-2 rounded-xl border border-amber-300 text-sm focus:outline-none focus:ring-2 focus:ring-amber-500 bg-white/90">
             </div>
 
             <div>
               <label class="block text-xs font-bold text-amber-900 mb-1">Servicio de Spa *</label>
-              <select id="appService" required class="w-full px-3.5 py-2 rounded-xl border border-amber-300 text-sm focus:outline-none focus:ring-2 focus:ring-amber-500 bg-white">
+              <select id="appService" required class="w-full px-3.5 py-2 rounded-xl border border-amber-300 text-sm focus:outline-none focus:ring-2 focus:ring-amber-500 bg-white/90">
                 <!-- Se llena dinámicamente -->
               </select>
             </div>
@@ -165,22 +173,22 @@
             <div class="grid grid-cols-2 gap-3">
               <div>
                 <label class="block text-xs font-bold text-amber-900 mb-1">Fecha *</label>
-                <input type="date" id="appDate" required class="w-full px-3.5 py-2 rounded-xl border border-amber-300 text-sm focus:outline-none focus:ring-2 focus:ring-amber-500 bg-white">
+                <input type="date" id="appDate" required class="w-full px-3.5 py-2 rounded-xl border border-amber-300 text-sm focus:outline-none focus:ring-2 focus:ring-amber-500 bg-white/90">
               </div>
               <div>
                 <label class="block text-xs font-bold text-amber-900 mb-1">Hora *</label>
-                <input type="time" id="appTime" required class="w-full px-3.5 py-2 rounded-xl border border-amber-300 text-sm focus:outline-none focus:ring-2 focus:ring-amber-500 bg-white">
+                <input type="time" id="appTime" required class="w-full px-3.5 py-2 rounded-xl border border-amber-300 text-sm focus:outline-none focus:ring-2 focus:ring-amber-500 bg-white/90">
               </div>
             </div>
 
             <div class="grid grid-cols-2 gap-3">
               <div>
                 <label class="block text-xs font-bold text-amber-900 mb-1">Pago / Anticipo ($) *</label>
-                <input type="number" id="appDeposit" min="0" step="0.01" required placeholder="0.00" class="w-full px-3.5 py-2 rounded-xl border border-amber-300 text-sm focus:outline-none focus:ring-2 focus:ring-amber-500 bg-white">
+                <input type="number" id="appDeposit" min="0" step="0.01" required placeholder="0.00" class="w-full px-3.5 py-2 rounded-xl border border-amber-300 text-sm focus:outline-none focus:ring-2 focus:ring-amber-500 bg-white/90">
               </div>
               <div>
                 <label class="block text-xs font-bold text-amber-900 mb-1">Estado de Pago</label>
-                <select id="appPaymentStatus" class="w-full px-3.5 py-2 rounded-xl border border-amber-300 text-sm focus:outline-none focus:ring-2 focus:ring-amber-500 bg-white">
+                <select id="appPaymentStatus" class="w-full px-3.5 py-2 rounded-xl border border-amber-300 text-sm focus:outline-none focus:ring-2 focus:ring-amber-500 bg-white/90">
                   <option value="Anticipo">Anticipo</option>
                   <option value="Pagado Completo">Pagado Completo</option>
                   <option value="Pendiente">Pendiente</option>
@@ -190,7 +198,7 @@
 
             <div>
               <label class="block text-xs font-bold text-amber-900 mb-1">Notas o preferencia</label>
-              <textarea id="appNotes" rows="2" placeholder="Ej. Alergia a aceites de almendra, prefiere presión media..." class="w-full px-3.5 py-2 rounded-xl border border-amber-300 text-sm focus:outline-none focus:ring-2 focus:ring-amber-500 bg-white"></textarea>
+              <textarea id="appNotes" rows="2" placeholder="Ej. Alergia a aceites de almendra, prefiere presión media..." class="w-full px-3.5 py-2 rounded-xl border border-amber-300 text-sm focus:outline-none focus:ring-2 focus:ring-amber-500 bg-white/90"></textarea>
             </div>
 
             <div class="pt-2 flex space-x-2">
@@ -208,10 +216,10 @@
         <!-- FILTROS Y TARJETAS DE CITAS -->
         <div class="lg:col-span-8 space-y-4">
           
-          <div class="bg-yellow-50 p-4 rounded-2xl border border-amber-300 shadow-sm flex flex-col sm:flex-row items-center justify-between gap-3">
+          <div class="bg-yellow-50/95 backdrop-blur-md p-4 rounded-2xl border border-amber-300 shadow-lg flex flex-col sm:flex-row items-center justify-between gap-3">
             <div class="relative flex-1 w-full">
               <i data-lucide="search" class="w-4 h-4 text-amber-600 absolute left-3 top-1/2 transform -translate-y-1/2"></i>
-              <input type="text" id="searchApp" oninput="renderAppointments()" placeholder="Buscar cliente o teléfono..." class="w-full pl-9 pr-3 py-2 bg-white border border-amber-300 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-amber-500">
+              <input type="text" id="searchApp" oninput="renderAppointments()" placeholder="Buscar cliente o teléfono..." class="w-full pl-9 pr-3 py-2 bg-white/90 border border-amber-300 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-amber-500">
             </div>
 
             <div class="flex items-center space-x-2 w-full sm:w-auto">
@@ -221,7 +229,7 @@
               <button onclick="setFilterDate('all')" class="px-3 py-1.5 bg-yellow-200 text-amber-950 border border-amber-300 text-xs font-bold rounded-lg hover:bg-yellow-300 transition-colors">
                 Todas
               </button>
-              <input type="date" id="filterDate" onchange="renderAppointments()" class="px-2.5 py-1 bg-white border border-amber-300 rounded-lg text-xs focus:outline-none font-bold text-amber-900">
+              <input type="date" id="filterDate" onchange="renderAppointments()" class="px-2.5 py-1 bg-white/90 border border-amber-300 rounded-lg text-xs focus:outline-none font-bold text-amber-900">
             </div>
           </div>
 
@@ -239,7 +247,7 @@
       <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
 
         <!-- Agregar Servicio -->
-        <div class="lg:col-span-4 bg-yellow-50 p-6 rounded-2xl border border-amber-300 shadow-md space-y-4">
+        <div class="lg:col-span-4 bg-yellow-50/95 backdrop-blur-md p-6 rounded-2xl border border-amber-300 shadow-xl space-y-4">
           <div class="flex items-center space-x-2 border-b border-amber-200 pb-3">
             <i data-lucide="plus-circle" class="w-5 h-5 text-amber-700"></i>
             <h2 class="text-lg font-bold font-serif-title text-amber-950">Nuevo Servicio o Masaje</h2>
@@ -248,23 +256,23 @@
           <form onsubmit="saveService(event)" class="space-y-4">
             <div>
               <label class="block text-xs font-bold text-amber-900 mb-1">Nombre del Servicio *</label>
-              <input type="text" id="serviceName" required placeholder="Ej. Masaje Relajante con Aceite de Girasol" class="w-full px-3.5 py-2 rounded-xl border border-amber-300 text-sm focus:outline-none focus:ring-2 focus:ring-amber-500 bg-white">
+              <input type="text" id="serviceName" required placeholder="Ej. Masaje Relajante con Aceite de Girasol" class="w-full px-3.5 py-2 rounded-xl border border-amber-300 text-sm focus:outline-none focus:ring-2 focus:ring-amber-500 bg-white/90">
             </div>
 
             <div class="grid grid-cols-2 gap-3">
               <div>
                 <label class="block text-xs font-bold text-amber-900 mb-1">Precio ($) *</label>
-                <input type="number" id="servicePrice" required min="0" step="0.01" placeholder="500" class="w-full px-3.5 py-2 rounded-xl border border-amber-300 text-sm focus:outline-none focus:ring-2 focus:ring-amber-500 bg-white">
+                <input type="number" id="servicePrice" required min="0" step="0.01" placeholder="500" class="w-full px-3.5 py-2 rounded-xl border border-amber-300 text-sm focus:outline-none focus:ring-2 focus:ring-amber-500 bg-white/90">
               </div>
               <div>
                 <label class="block text-xs font-bold text-amber-900 mb-1">Duración (min) *</label>
-                <input type="number" id="serviceDuration" required min="1" placeholder="60" class="w-full px-3.5 py-2 rounded-xl border border-amber-300 text-sm focus:outline-none focus:ring-2 focus:ring-amber-500 bg-white">
+                <input type="number" id="serviceDuration" required min="1" placeholder="60" class="w-full px-3.5 py-2 rounded-xl border border-amber-300 text-sm focus:outline-none focus:ring-2 focus:ring-amber-500 bg-white/90">
               </div>
             </div>
 
             <div>
               <label class="block text-xs font-bold text-amber-900 mb-1">Descripción del servicio</label>
-              <textarea id="serviceDesc" rows="2" placeholder="Incluye aromaterapia, piedras calientes, exfoliación..." class="w-full px-3.5 py-2 rounded-xl border border-amber-300 text-sm focus:outline-none focus:ring-2 focus:ring-amber-500 bg-white"></textarea>
+              <textarea id="serviceDesc" rows="2" placeholder="Incluye aromaterapia, piedras calientes, exfoliación..." class="w-full px-3.5 py-2 rounded-xl border border-amber-300 text-sm focus:outline-none focus:ring-2 focus:ring-amber-500 bg-white/90"></textarea>
             </div>
 
             <button type="submit" class="w-full bg-amber-500 hover:bg-amber-600 text-amber-950 font-bold py-2.5 rounded-xl text-sm transition-all shadow-md flex items-center justify-center space-x-2 border border-amber-600">
@@ -274,9 +282,9 @@
           </form>
         </div>
 
-        <!-- Lista de Servicios con Tarjetas Temáticas -->
+        <!-- Lista de Servicios -->
         <div class="lg:col-span-8">
-          <div class="bg-yellow-50 p-6 rounded-2xl border border-amber-300 shadow-md space-y-4">
+          <div class="bg-yellow-50/95 backdrop-blur-md p-6 rounded-2xl border border-amber-300 shadow-xl space-y-4">
             <div class="flex justify-between items-center border-b border-amber-200 pb-3">
               <h2 class="text-lg font-bold font-serif-title text-amber-950">Servicios Disponibles</h2>
               <span class="text-xs font-bold text-amber-800 bg-yellow-200 px-3 py-1 rounded-full border border-amber-300">🌻 Menú Spa</span>
@@ -294,7 +302,7 @@
   </main>
 
   <script>
-    // --- SERVICIOS POR DEFECTO CON TEMA SPA & GIRASOL ---
+    // --- SERVICIOS POR DEFECTO ---
     const defaultServices = [
       { id: 's1', name: 'Masaje Relajante de Girasol & Aromaterapia', price: 450, duration: 60, desc: 'Masaje corporal descontracturante con aceites esenciales naturales.' },
       { id: 's2', name: 'Facial Hidratante Profundo & Iluminador', price: 500, duration: 50, desc: 'Limpieza facial profunda, exfoliación suave y mascarilla de ácido hialurónico.' },
@@ -323,8 +331,8 @@
       document.getElementById('sec-appointments').classList.add('hidden');
       document.getElementById('sec-services').classList.add('hidden');
       
-      document.getElementById('tab-appointments').className = "tab-btn px-5 py-2.5 rounded-xl text-sm font-bold flex items-center space-x-2 transition-all text-amber-900 hover:bg-amber-200/60";
-      document.getElementById('tab-services').className = "tab-btn px-5 py-2.5 rounded-xl text-sm font-bold flex items-center space-x-2 transition-all text-amber-900 hover:bg-amber-200/60";
+      document.getElementById('tab-appointments').className = "tab-btn px-5 py-2.5 rounded-xl text-sm font-bold flex items-center space-x-2 transition-all text-amber-950 bg-yellow-100/70 hover:bg-amber-200 border border-amber-300";
+      document.getElementById('tab-services').className = "tab-btn px-5 py-2.5 rounded-xl text-sm font-bold flex items-center space-x-2 transition-all text-amber-950 bg-yellow-100/70 hover:bg-amber-200 border border-amber-300";
 
       if (tab === 'appointments') {
         document.getElementById('sec-appointments').classList.remove('hidden');
@@ -350,7 +358,7 @@
         return;
       }
       container.innerHTML = services.map(s => `
-        <div class="p-4 bg-white rounded-xl border border-amber-300 shadow-sm flex flex-col justify-between">
+        <div class="p-4 bg-white/90 backdrop-blur-sm rounded-xl border border-amber-300 shadow-sm flex flex-col justify-between">
           <div>
             <div class="flex justify-between items-start">
               <h3 class="font-bold text-amber-950 flex items-center gap-1">
@@ -485,9 +493,14 @@
 
       if (filtered.length === 0) {
         container.innerHTML = `
-          <div class="bg-yellow-50 p-8 rounded-2xl border border-amber-300 text-center text-amber-800">
-            <i data-lucide="calendar-x" class="w-10 h-10 mx-auto mb-2 text-amber-600"></i>
-            <p class="text-sm font-bold">No hay citas registradas con estos datos.</p>
+          <div class="empty-state-bg p-10 rounded-2xl border-2 border-amber-300 shadow-lg text-center space-y-3">
+            <div class="w-16 h-16 mx-auto bg-amber-400/80 border border-amber-500 rounded-full flex items-center justify-center text-amber-950 shadow-md">
+              <i data-lucide="flower-2" class="w-8 h-8"></i>
+            </div>
+            <div>
+              <h3 class="text-base font-bold font-serif-title text-amber-950">No hay citas registradas</h3>
+              <p class="text-xs font-semibold text-amber-900 mt-1">Utiliza el formulario de la izquierda para agendar una nueva cita de masaje o facial.</p>
+            </div>
           </div>
         `;
         lucide.createIcons();
@@ -497,7 +510,7 @@
       container.innerHTML = filtered.map(a => {
         const isToday = a.date === todayStr;
         return `
-          <div class="bg-white p-5 rounded-2xl border ${isToday ? 'border-amber-500 ring-2 ring-amber-300' : 'border-amber-200'} shadow-sm transition-all hover:shadow-md">
+          <div class="bg-white/95 backdrop-blur-md p-5 rounded-2xl border ${isToday ? 'border-amber-500 ring-2 ring-amber-400' : 'border-amber-200'} shadow-md transition-all hover:shadow-lg">
             <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 border-b border-amber-100 pb-3">
               <div>
                 <div class="flex items-center space-x-2">
@@ -586,11 +599,11 @@
         alertCount.innerText = `${todayApps.length} Cita(s) Hoy 🌻`;
         bannerText.innerText = `Tienes ${todayApps.length} persona(s) agendada(s) para hoy. Haz clic para enviarles su recordatorio por WhatsApp.`;
         alertBanner.classList.remove('hidden');
-        alertBadge.className = "flex items-center space-x-2 px-4 py-1.5 rounded-full text-xs font-bold bg-amber-400 text-amber-950 border border-amber-500 shadow-sm";
+        alertBadge.className = "flex items-center space-x-2 px-3.5 py-1.5 rounded-full text-xs font-bold bg-amber-400 text-amber-950 border border-amber-500 shadow-sm";
       } else {
         alertCount.innerText = `Sin citas hoy`;
         alertBanner.classList.add('hidden');
-        alertBadge.className = "flex items-center space-x-2 px-4 py-1.5 rounded-full text-xs font-bold bg-yellow-200 text-amber-900 border border-amber-300";
+        alertBadge.className = "flex items-center space-x-2 px-3.5 py-1.5 rounded-full text-xs font-bold bg-yellow-200 text-amber-900 border border-amber-300";
       }
     }
 
