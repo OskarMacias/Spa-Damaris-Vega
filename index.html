@@ -70,7 +70,7 @@
     📋 ¡Número copiado al portapapeles!
   </div>
 
-  <!-- AVISO EN TIEMPO REAL CENTRADO EN LA VISTA ACTUAL -->
+  <!-- AVISO EN TIEMPO REAL CENTRADO -->
   <div id="realtimeNotification" class="hidden absolute left-1/2 transform -translate-x-1/2 z-50 w-[92%] max-w-md bg-amber-500 text-amber-950 p-4 rounded-2xl shadow-2xl border-2 border-amber-600 animate-pop-in">
     <div class="flex items-start justify-between gap-3">
       <div class="flex items-start space-x-3">
@@ -129,7 +129,7 @@
         <span>🌻 Centro Holístico & Spa</span>
       </div>
       <h2 class="text-2xl md:text-3xl font-serif-title font-bold text-amber-950">Reserva tu Experiencia de Relajación</h2>
-      <p class="text-xs md:text-sm font-semibold text-amber-950">Selecciona tu masaje o tratamiento facial preferido y agenda tu horario disponible.</p>
+      <p class="text-xs md:text-sm font-semibold text-amber-950">Selecciona uno o varios servicios y agenda tu horario disponible.</p>
     </div>
   </div>
 
@@ -172,14 +172,24 @@
         <span>📋 Panel de Citas</span>
       </button>
 
+      <button onclick="switchTab('admin-clients')" id="tab-admin-clients" class="admin-only-tab tab-btn px-4 py-2 rounded-xl text-xs sm:text-sm font-bold flex items-center space-x-2 transition-all text-amber-950 bg-yellow-100/80 hover:bg-amber-200 border border-amber-300">
+        <i data-lucide="users" class="w-4 h-4 text-amber-800"></i>
+        <span>👥 Registro de Clientes</span>
+      </button>
+
       <button onclick="switchTab('admin-services')" id="tab-admin-services" class="admin-only-tab tab-btn px-4 py-2 rounded-xl text-xs sm:text-sm font-bold flex items-center space-x-2 transition-all text-amber-950 bg-yellow-100/80 hover:bg-amber-200 border border-amber-300">
         <i data-lucide="settings" class="w-4 h-4 text-amber-800"></i>
-        <span>⚙️ Gestión de Servicios</span>
+        <span>⚙️ Servicios y Promos</span>
       </button>
 
       <button onclick="switchTab('admin-payment-config')" id="tab-admin-payment-config" class="admin-only-tab tab-btn px-4 py-2 rounded-xl text-xs sm:text-sm font-bold flex items-center space-x-2 transition-all text-amber-950 bg-yellow-100/80 hover:bg-amber-200 border border-amber-300">
         <i data-lucide="wallet" class="w-4 h-4 text-amber-800"></i>
         <span>💳 Configurar Cuentas</span>
+      </button>
+
+      <button onclick="switchTab('admin-security')" id="tab-admin-security" class="admin-only-tab tab-btn px-4 py-2 rounded-xl text-xs sm:text-sm font-bold flex items-center space-x-2 transition-all text-amber-950 bg-yellow-100/80 hover:bg-amber-200 border border-amber-300">
+        <i data-lucide="key" class="w-4 h-4 text-amber-800"></i>
+        <span>🔐 Seguridad</span>
       </button>
     </div>
 
@@ -208,22 +218,24 @@
             </div>
 
             <div>
-              <label class="block text-xs font-bold text-amber-900 mb-1">Selecciona tu Servicio o Masaje *</label>
-              <select id="clientService" required onchange="updateServiceInfo()" class="w-full px-3.5 py-2 rounded-xl border border-amber-300 text-sm focus:outline-none focus:ring-2 focus:ring-amber-500 bg-white/90 font-medium text-amber-950">
-              </select>
+              <label class="block text-xs font-bold text-amber-900 mb-1">Selecciona uno o más Servicios (Puedes marcar varios) *</label>
+              <div id="clientServicesCheckboxes" class="space-y-2 max-h-48 overflow-y-auto p-3 bg-white/90 rounded-xl border border-amber-300">
+                <!-- Se llena dinámicamente -->
+              </div>
             </div>
 
             <div id="serviceDetailBadge" class="hidden p-3.5 bg-amber-100/90 rounded-xl border border-amber-300 text-xs text-amber-900 space-y-2">
-              <p id="serviceDetailDesc" class="italic">Descripción del servicio...</p>
-              <div class="flex justify-between font-bold pt-1 text-amber-950 border-t border-amber-200">
-                <span id="serviceDetailTime">⏱ Duración: -- min</span>
-                <span id="serviceDetailPrice" class="text-amber-900">💰 Precio: $--</span>
+              <div class="flex justify-between font-bold text-amber-950">
+                <span id="multiServiceTime">⏱ Duración Total: -- min</span>
+                <span id="multiServicePrice" class="text-amber-900">💰 Total: $--</span>
+              </div>
+              <div id="promoAppliedBadge" class="hidden text-emerald-900 font-extrabold bg-emerald-100 p-2 rounded-lg border border-emerald-300">
+                🎉 ¡Promoción o descuento aplicado!
               </div>
               <div class="bg-amber-200/90 p-2 rounded-lg border border-amber-400 font-extrabold text-amber-950 flex items-center justify-between">
                 <span>💵 Anticipo Mínimo Requerido:</span>
                 <span id="serviceDetailMinDeposit" class="text-sm font-black text-rose-900">$0.00</span>
               </div>
-              <p id="serviceDetailRequirements" class="text-[11px] text-stone-700 font-semibold italic">Requisitos: Ninguno</p>
             </div>
 
             <div class="grid grid-cols-2 gap-3">
@@ -241,7 +253,7 @@
 
             <div>
               <label class="block text-xs font-bold text-amber-900 mb-1">Notas especiales o preferencia (Opcional)</label>
-              <textarea id="clientNotes" rows="2" placeholder="Ej. Alergia a aceites de nuez, preferencia de presión..." class="w-full px-3.5 py-2 rounded-xl border border-amber-300 text-sm focus:outline-none focus:ring-2 focus:ring-amber-500 bg-white/90"></textarea>
+              <textarea id="clientNotes" rows="2" placeholder="Ej. Alergia a aceites de nuez..." class="w-full px-3.5 py-2 rounded-xl border border-amber-300 text-sm focus:outline-none focus:ring-2 focus:ring-amber-500 bg-white/90"></textarea>
             </div>
 
             <div class="p-3 bg-red-50 border border-red-300 rounded-xl space-y-2 text-xs text-red-950">
@@ -251,13 +263,13 @@
               </p>
               <ul class="list-disc pl-4 space-y-1 text-[11px] font-semibold text-stone-800">
                 <li>Debes acudir <strong>15 minutos antes</strong> de tu cita.</li>
-                <li>Si llegas pasadas la hora de tu cita (ejemplo 3:05 PM para cita de 3:00 PM), la cita queda <strong>automáticamente cancelada</strong>.</li>
-                <li><strong>NO hay reembolsos</strong> del anticipo o pago en citas canceladas o impuntuales.</li>
+                <li>Si llegas pasada la hora de tu cita, queda <strong>automáticamente cancelada</strong>.</li>
+                <li><strong>NO hay reembolsos</strong> del anticipo.</li>
               </ul>
               
               <label class="flex items-start space-x-2 pt-1 cursor-pointer">
                 <input type="checkbox" id="termsCheck" required class="mt-0.5 rounded border-red-400 text-amber-600 focus:ring-amber-500">
-                <span class="text-[11px] font-bold text-red-900 leading-tight">Acepto los requisitos, puntualidad y la política de NO reembolso por cancelación o impuntualidad. *</span>
+                <span class="text-[11px] font-bold text-red-900 leading-tight">Acepto los requisitos, puntualidad y la política de NO reembolso. *</span>
               </label>
             </div>
 
@@ -271,7 +283,7 @@
         <div class="lg:col-span-6 space-y-4">
           <div class="bg-yellow-50/95 backdrop-blur-md p-6 rounded-2xl border border-amber-300 shadow-xl space-y-4">
             <h3 class="text-lg font-bold font-serif-title text-amber-950 border-b border-amber-200 pb-2 flex items-center gap-2">
-              <span>💆‍♀️</span> Nuestros Servicios Destacados
+              <span>💆‍♀️</span> Nuestros Servicios y Promociones Activas
             </h3>
             <div id="clientCatalogList" class="space-y-3 max-h-[540px] overflow-y-auto pr-1">
             </div>
@@ -297,8 +309,8 @@
 
         <div class="bg-amber-100/90 p-4 rounded-xl border border-amber-300 text-xs text-amber-950 space-y-2">
           <p class="font-bold flex items-center gap-1"><span>📲</span> Envío de Comprobante:</p>
-          <p>Una vez realizado tu anticipo, por favor presiona el botón de abajo para enviar la captura del comprobante por WhatsApp y confirmar tu lugar.</p>
-          <a href="https://wa.me/526674992354?text=Hola,%20adjunto%20mi%20comprobante%20de%20pago%20para%20confirmar%20mi%20cita%20en%20el%20Spa." target="_blank" class="inline-flex items-center space-x-2 bg-emerald-600 hover:bg-emerald-700 text-white font-bold px-4 py-2 rounded-xl text-xs shadow-md transition-colors">
+          <p>Una vez realizado tu anticipo, por favor presiona el botón de abajo para enviar la captura del comprobante por WhatsApp.</p>
+          <a href="https://wa.me/526674992354?text=Hola,%20adjunto%20mi%20comprobante%20de%20pago." target="_blank" class="inline-flex items-center space-x-2 bg-emerald-600 hover:bg-emerald-700 text-white font-bold px-4 py-2 rounded-xl text-xs shadow-md transition-colors">
             <i data-lucide="message-circle" class="w-4 h-4"></i>
             <span>Enviar Comprobante por WhatsApp</span>
           </a>
@@ -318,36 +330,50 @@
         </div>
 
         <div class="flex flex-wrap gap-2 pt-1 border-t border-amber-200/80">
-          <button id="btnFilterAll" onclick="setFilterStatus('all')" class="px-3 py-1.5 bg-amber-500 text-amber-950 font-bold text-xs rounded-lg border border-amber-600 transition-all">
-            Todas
-          </button>
-          <button id="btnFilterToday" onclick="setFilterStatus('today')" class="px-3 py-1.5 bg-yellow-200 text-amber-950 font-bold text-xs rounded-lg border border-amber-300 hover:bg-yellow-300 transition-all">
-            🌻 Citas de Hoy
-          </button>
-          <button id="btnFilterConfirmed" onclick="setFilterStatus('confirmed')" class="px-3 py-1.5 bg-emerald-100 text-emerald-950 font-bold text-xs rounded-lg border border-emerald-300 hover:bg-emerald-200 transition-all">
-            ✅ Con Anticipo / Confirmadas
-          </button>
-          <button id="btnFilterPending" onclick="setFilterStatus('pending')" class="px-3 py-1.5 bg-amber-100 text-amber-900 font-bold text-xs rounded-lg border border-amber-300 hover:bg-amber-200 transition-all">
-            ⏳ Pendientes de Confirmar
-          </button>
+          <button id="btnFilterAll" onclick="setFilterStatus('all')" class="px-3 py-1.5 bg-amber-500 text-amber-950 font-bold text-xs rounded-lg border border-amber-600 transition-all">Todas</button>
+          <button id="btnFilterToday" onclick="setFilterStatus('today')" class="px-3 py-1.5 bg-yellow-200 text-amber-950 font-bold text-xs rounded-lg border border-amber-300 hover:bg-yellow-300 transition-all">🌻 Citas de Hoy</button>
+          <button id="btnFilterConfirmed" onclick="setFilterStatus('confirmed')" class="px-3 py-1.5 bg-emerald-100 text-emerald-950 font-bold text-xs rounded-lg border border-emerald-300 hover:bg-emerald-200 transition-all">✅ Confirmadas</button>
+          <button id="btnFilterPending" onclick="setFilterStatus('pending')" class="px-3 py-1.5 bg-amber-100 text-amber-900 font-bold text-xs rounded-lg border border-amber-300 hover:bg-amber-200 transition-all">⏳ Pendientes</button>
         </div>
       </div>
 
-      <div id="adminAppointmentsList" class="space-y-3">
+      <div id="adminAppointmentsList" class="space-y-3"></div>
+    </section>
+
+    <!-- VISTA 4: ADMIN - REGISTRO DE CLIENTES Y HISTORIAL -->
+    <section id="sec-admin-clients" class="hidden space-y-6">
+      <div class="bg-yellow-50/95 backdrop-blur-md p-6 rounded-2xl border border-amber-300 shadow-xl space-y-4">
+        <div class="flex justify-between items-center border-b border-amber-200 pb-3">
+          <div>
+            <h2 class="text-lg font-bold font-serif-title text-amber-950">Base de Datos de Clientes 👥</h2>
+            <p class="text-xs text-amber-900">Visualiza el historial de visitas, cuándo fue su última cita y envíales promociones directo.</p>
+          </div>
+          <span class="text-xs font-bold text-amber-800 bg-yellow-200 px-3 py-1 rounded-full border border-amber-300" id="totalClientsCount">0 Clientes</span>
+        </div>
+
+        <div class="relative">
+          <i data-lucide="search" class="w-4 h-4 text-amber-600 absolute left-3 top-1/2 transform -translate-y-1/2"></i>
+          <input type="text" id="searchClientDb" oninput="renderAdminClientsList()" placeholder="Buscar cliente por nombre o teléfono..." class="w-full pl-9 pr-3 py-2 bg-white/90 border border-amber-300 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-amber-500">
+        </div>
+
+        <div id="adminClientsList" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <!-- Se llena dinámicamente -->
+        </div>
       </div>
     </section>
 
-    <!-- VISTA 4: ADMIN - GESTIÓN DE SERVICIOS -->
+    <!-- VISTA 5: ADMIN - GESTIÓN DE SERVICIOS Y PROMOCIONES -->
     <section id="sec-admin-services" class="hidden space-y-6">
       <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
 
-        <div class="lg:col-span-4 bg-yellow-50/95 backdrop-blur-md p-6 rounded-2xl border border-amber-300 shadow-xl space-y-4">
-          <div class="flex items-center space-x-2 border-b border-amber-200 pb-3">
-            <i data-lucide="plus-circle" class="w-5 h-5 text-amber-700"></i>
-            <h2 class="text-lg font-bold font-serif-title text-amber-950">Agregar / Editar Servicio</h2>
+        <div class="lg:col-span-5 bg-yellow-50/95 backdrop-blur-md p-6 rounded-2xl border border-amber-300 shadow-xl space-y-4">
+          <div class="flex items-center justify-between border-b border-amber-200 pb-3">
+            <h2 id="serviceFormTitle" class="text-lg font-bold font-serif-title text-amber-950">Agregar / Editar Servicio</h2>
+            <button id="cancelEditServiceBtn" onclick="resetServiceForm()" class="hidden text-xs text-rose-700 font-bold underline">Cancelar Edición</button>
           </div>
 
-          <form onsubmit="saveService(event)" class="space-y-4">
+          <form onsubmit="saveService(event)" class="space-y-3">
+            <input type="hidden" id="editServiceId">
             <div>
               <label class="block text-xs font-bold text-amber-900 mb-1">Nombre del Servicio *</label>
               <input type="text" id="serviceName" required placeholder="Ej. Masaje Descontracturante" class="w-full px-3.5 py-2 rounded-xl border border-amber-300 text-sm focus:outline-none focus:ring-2 focus:ring-amber-500 bg-white/90">
@@ -370,29 +396,50 @@
 
             <div>
               <label class="block text-xs font-bold text-amber-900 mb-1">Descripción corta</label>
-              <textarea id="serviceDesc" rows="2" placeholder="Incluye aromaterapia, aceites relajantes..." class="w-full px-3.5 py-2 rounded-xl border border-amber-300 text-sm focus:outline-none focus:ring-2 focus:ring-amber-500 bg-white/90"></textarea>
+              <textarea id="serviceDesc" rows="2" placeholder="Incluye aromaterapia..." class="w-full px-3.5 py-2 rounded-xl border border-amber-300 text-sm focus:outline-none focus:ring-2 focus:ring-amber-500 bg-white/90"></textarea>
             </div>
 
             <div>
-              <label class="block text-xs font-bold text-amber-900 mb-1">Requisitos para el Cliente (Ficha)</label>
-              <textarea id="serviceRequirements" rows="2" placeholder="Ej. Venir con rostro sin maquillaje, ropa cómoda..." class="w-full px-3.5 py-2 rounded-xl border border-amber-300 text-sm focus:outline-none focus:ring-2 focus:ring-amber-500 bg-white/90"></textarea>
+              <label class="block text-xs font-bold text-amber-900 mb-1">Requisitos para el Cliente</label>
+              <textarea id="serviceRequirements" rows="2" placeholder="Ej. Venir con ropa cómoda..." class="w-full px-3.5 py-2 rounded-xl border border-amber-300 text-sm focus:outline-none focus:ring-2 focus:ring-amber-500 bg-white/90"></textarea>
             </div>
 
             <button type="submit" class="w-full bg-amber-500 hover:bg-amber-600 text-amber-950 font-bold py-2.5 rounded-xl text-sm transition-all shadow-md flex items-center justify-center space-x-2 border border-amber-600">
               <i data-lucide="save" class="w-4 h-4"></i>
-              <span>Guardar Servicio</span>
+              <span id="serviceSubmitBtnText">Guardar Servicio</span>
             </button>
           </form>
+
+          <!-- SECCIÓN PARA CONFIGURAR PROMOCIONES Y PAQUETES -->
+          <div class="border-t border-amber-200 pt-4 space-y-3">
+            <h3 class="text-sm font-bold font-serif-title text-amber-950">🎁 Promociones & Descuentos por Paquete</h3>
+            
+            <form onsubmit="savePromoConfig(event)" class="space-y-3 text-xs">
+              <div>
+                <label class="block font-bold text-amber-900 mb-1">Descuento al combinar 2 o más servicios (%)</label>
+                <input type="number" id="comboDiscount" min="0" max="100" placeholder="Ej. 10 (para 10% de descuento)" class="w-full px-3 py-1.5 rounded-xl border border-amber-300 bg-white/90 font-bold">
+              </div>
+
+              <div>
+                <label class="block font-bold text-amber-900 mb-1">Aviso de Promoción General (Banner para Clientes)</label>
+                <input type="text" id="promoBannerText" placeholder="Ej. ¡15% de descuento este fin de semana al registrarte!" class="w-full px-3 py-1.5 rounded-xl border border-amber-300 bg-white/90">
+              </div>
+
+              <button type="submit" class="w-full bg-amber-800 hover:bg-amber-900 text-yellow-300 font-bold py-2 rounded-xl text-xs transition-all shadow-sm">
+                Guardar Configuración de Promociones
+              </button>
+            </form>
+          </div>
         </div>
 
-        <div class="lg:col-span-8">
+        <div class="lg:col-span-7">
           <div class="bg-yellow-50/95 backdrop-blur-md p-6 rounded-2xl border border-amber-300 shadow-xl space-y-4">
             <div class="flex justify-between items-center border-b border-amber-200 pb-3">
               <h2 class="text-lg font-bold font-serif-title text-amber-950">Catálogo de Servicios Activos</h2>
-              <span class="text-xs font-bold text-amber-800 bg-yellow-200 px-3 py-1 rounded-full border border-amber-300">🌻 Menú Spa</span>
+              <span class="text-xs font-bold text-amber-800 bg-yellow-200 px-3 py-1 rounded-full border border-amber-300">🌻 Editar o Eliminar</span>
             </div>
             
-            <div id="adminServicesList" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div id="adminServicesList" class="grid grid-cols-1 gap-3 max-h-[500px] overflow-y-auto pr-1">
             </div>
           </div>
         </div>
@@ -400,7 +447,7 @@
       </div>
     </section>
 
-    <!-- VISTA 5: ADMIN - CONFIGURACIÓN DE CUENTAS DE PAGO -->
+    <!-- VISTA 6: ADMIN - CONFIGURACIÓN DE CUENTAS DE PAGO -->
     <section id="sec-admin-payment-config" class="hidden space-y-6">
       <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
 
@@ -413,7 +460,7 @@
           <form onsubmit="savePaymentAccount(event)" class="space-y-4">
             <div>
               <label class="block text-xs font-bold text-amber-900 mb-1">Nombre de la Institución o Método *</label>
-              <input type="text" id="accBank" required placeholder="Ej. BBVA BANCOMER / DEPÓSITO EN OXXO" class="w-full px-3.5 py-2 rounded-xl border border-amber-300 text-sm focus:outline-none focus:ring-2 focus:ring-amber-500 bg-white/90">
+              <input type="text" id="accBank" required placeholder="Ej. MERCADO PAGO / BBVA" class="w-full px-3.5 py-2 rounded-xl border border-amber-300 text-sm focus:outline-none focus:ring-2 focus:ring-amber-500 bg-white/90">
             </div>
 
             <div>
@@ -423,12 +470,12 @@
 
             <div>
               <label class="block text-xs font-bold text-amber-900 mb-1">Número de Cuenta / CLABE / Tarjeta *</label>
-              <input type="text" id="accNumber" required placeholder="Ej. CLABE: 012730015... o Tarjeta: 4152..." class="w-full px-3.5 py-2 rounded-xl border border-amber-300 text-sm focus:outline-none focus:ring-2 focus:ring-amber-500 bg-white/90">
+              <input type="text" id="accNumber" required placeholder="Ej. 72296902..." class="w-full px-3.5 py-2 rounded-xl border border-amber-300 text-sm focus:outline-none focus:ring-2 focus:ring-amber-500 bg-white/90">
             </div>
 
             <div>
               <label class="block text-xs font-bold text-amber-900 mb-1">Instrucciones o Notas adicionales</label>
-              <textarea id="accNotes" rows="2" placeholder="Ej. Enviar foto del recibo por WhatsApp al 6674992354..." class="w-full px-3.5 py-2 rounded-xl border border-amber-300 text-sm focus:outline-none focus:ring-2 focus:ring-amber-500 bg-white/90"></textarea>
+              <textarea id="accNotes" rows="2" placeholder="Ej. Transferencia enviar captura..." class="w-full px-3.5 py-2 rounded-xl border border-amber-300 text-sm focus:outline-none focus:ring-2 focus:ring-amber-500 bg-white/90"></textarea>
             </div>
 
             <button type="submit" class="w-full bg-amber-500 hover:bg-amber-600 text-amber-950 font-bold py-2.5 rounded-xl text-sm transition-all shadow-md flex items-center justify-center space-x-2 border border-amber-600">
@@ -450,6 +497,38 @@
           </div>
         </div>
 
+      </div>
+    </section>
+
+    <!-- VISTA 7: ADMIN - SEGURIDAD (CAMBIO DE CONTRASEÑA) -->
+    <section id="sec-admin-security" class="hidden space-y-6">
+      <div class="max-w-md mx-auto bg-yellow-50/95 backdrop-blur-md p-6 rounded-2xl border border-amber-300 shadow-xl space-y-4">
+        <div class="flex items-center space-x-2 border-b border-amber-200 pb-3">
+          <i data-lucide="key" class="w-5 h-5 text-amber-700"></i>
+          <h2 class="text-lg font-bold font-serif-title text-amber-950">Cambiar Contraseña de Administrador</h2>
+        </div>
+
+        <form onsubmit="changeAdminPassword(event)" class="space-y-4">
+          <div>
+            <label class="block text-xs font-bold text-amber-900 mb-1">Contraseña Actual *</label>
+            <input type="password" id="currentPass" required placeholder="Ingresa tu contraseña actual" class="w-full px-3.5 py-2 rounded-xl border border-amber-300 text-sm focus:outline-none focus:ring-2 focus:ring-amber-500 bg-white/90">
+          </div>
+
+          <div>
+            <label class="block text-xs font-bold text-amber-900 mb-1">Nueva Contraseña *</label>
+            <input type="password" id="newPass" required placeholder="Ingresa la nueva contraseña" class="w-full px-3.5 py-2 rounded-xl border border-amber-300 text-sm focus:outline-none focus:ring-2 focus:ring-amber-500 bg-white/90">
+          </div>
+
+          <div>
+            <label class="block text-xs font-bold text-amber-900 mb-1">Confirmar Nueva Contraseña *</label>
+            <input type="password" id="confirmNewPass" required placeholder="Repite la nueva contraseña" class="w-full px-3.5 py-2 rounded-xl border border-amber-300 text-sm focus:outline-none focus:ring-2 focus:ring-amber-500 bg-white/90">
+          </div>
+
+          <button type="submit" class="w-full bg-amber-500 hover:bg-amber-600 text-amber-950 font-bold py-3 rounded-xl text-sm transition-all shadow-md flex items-center justify-center space-x-2 border border-amber-600">
+            <i data-lucide="shield-check" class="w-4 h-4"></i>
+            <span>Actualizar Contraseña</span>
+          </button>
+        </form>
       </div>
     </section>
 
@@ -492,18 +571,25 @@
     let services = JSON.parse(localStorage.getItem('spa_services')) || defaultServices;
     let appointments = JSON.parse(localStorage.getItem('spa_appointments')) || [];
     let paymentAccounts = JSON.parse(localStorage.getItem('spa_payment_accounts')) || defaultAccounts;
-    let isAdminLoggedIn = false;
+    let promoConfig = JSON.parse(localStorage.getItem('spa_promo_config')) || { comboDiscount: 10, bannerText: '✨ ¡15% de descuento este fin de semana al registrarte! ✨' };
+    
+    // Sesión persistente y contraseña
+    let adminPassword = localStorage.getItem('spa_admin_pass') || '1234';
+    let isAdminLoggedIn = localStorage.getItem('spa_admin_session') === 'true';
     let currentAdminFilter = 'all';
 
     document.addEventListener('DOMContentLoaded', () => {
       lucide.createIcons();
       setMinDateToday();
-      renderClientServicesSelect();
+      checkPersistentSession();
+      renderClientServicesCheckboxes();
       renderClientCatalog();
       renderClientPaymentAccounts();
       renderAdminServicesList();
       renderAdminAppointments();
+      renderAdminClientsList();
       renderAdminAccountsList();
+      loadPromoConfigToForm();
       checkAdminAlerts();
       initRealtimeListener();
     });
@@ -511,6 +597,19 @@
     function setMinDateToday() {
       const today = new Date().toISOString().split('T')[0];
       document.getElementById('clientDate').min = today;
+    }
+
+    function checkPersistentSession() {
+      const adminTabs = document.querySelectorAll('.admin-only-tab');
+      if (isAdminLoggedIn) {
+        document.getElementById('roleBadge').innerText = "🔑 Admin";
+        document.getElementById('btnAdminText').innerText = "Salir Admin";
+        adminTabs.forEach(tab => tab.classList.remove('admin-only-tab'));
+      } else {
+        document.getElementById('roleBadge').innerText = "👤 Cliente";
+        document.getElementById('btnAdminText').innerText = "Admin";
+        adminTabs.forEach(tab => tab.classList.add('admin-only-tab'));
+      }
     }
 
     // LISTENER EN TIEMPO REAL (CITAS Y CUENTAS)
@@ -524,6 +623,7 @@
             appointments.push(newApp);
             localStorage.setItem('spa_appointments', JSON.stringify(appointments));
             renderAdminAppointments();
+            renderAdminClientsList();
             checkAdminAlerts();
             triggerRealtimePopup(newApp);
           }
@@ -557,8 +657,6 @@
       document.getElementById('rtNotifDetails').innerText = `${app.name} agendó "${app.service}" para el ${formattedDate} a las ${app.time} hs.`;
       
       const notif = document.getElementById('realtimeNotification');
-      
-      // Cálculo dinámico para centrarlo exactamente en la altura visible de la pantalla (incluso con zoom o scroll)
       const currentScroll = window.scrollY;
       const windowHeight = window.innerHeight;
       const topPos = currentScroll + (windowHeight / 2) - 80;
@@ -611,12 +709,13 @@
       }, 2500);
     }
 
-    // --- MODO ADMIN AUTH ---
+    // --- MODO ADMIN AUTH & CAMBIO DE CONTRASEÑA ---
     function toggleAdminAuth() {
       const adminTabs = document.querySelectorAll('.admin-only-tab');
 
       if (isAdminLoggedIn) {
         isAdminLoggedIn = false;
+        localStorage.setItem('spa_admin_session', 'false');
         document.getElementById('roleBadge').innerText = "👤 Cliente";
         document.getElementById('btnAdminText').innerText = "Admin";
         
@@ -626,8 +725,9 @@
         switchTab('client-book');
       } else {
         const pass = prompt('Ingresa la contraseña de Administrador:');
-        if (pass === '1234') { 
+        if (pass === adminPassword) { 
           isAdminLoggedIn = true;
+          localStorage.setItem('spa_admin_session', 'true');
           document.getElementById('roleBadge').innerText = "🔑 Admin";
           document.getElementById('btnAdminText').innerText = "Salir Admin";
           
@@ -641,8 +741,34 @@
       }
     }
 
+    function changeAdminPassword(e) {
+      e.preventDefault();
+      const current = document.getElementById('currentPass').value;
+      const newP = document.getElementById('newPass').value;
+      const confirmP = document.getElementById('confirmNewPass').value;
+
+      if (current !== adminPassword) {
+        alert('La contraseña actual es incorrecta.');
+        return;
+      }
+      if (newP !== confirmP) {
+        alert('Las nuevas contraseñas no coinciden.');
+        return;
+      }
+      if (newP.length < 4) {
+        alert('La contraseña debe tener al menos 4 caracteres.');
+        return;
+      }
+
+      adminPassword = newP;
+      localStorage.setItem('spa_admin_pass', adminPassword);
+      alert('¡Contraseña de administrador actualizada con éxito!');
+      e.target.reset();
+      switchTab('admin-appointments');
+    }
+
     function switchTab(tabId) {
-      const tabs = ['client-book', 'client-payments', 'admin-appointments', 'admin-services', 'admin-payment-config'];
+      const tabs = ['client-book', 'client-payments', 'admin-appointments', 'admin-clients', 'admin-services', 'admin-payment-config', 'admin-security'];
       tabs.forEach(t => {
         const sec = document.getElementById(`sec-${t}`);
         const btn = document.getElementById(`tab-${t}`);
@@ -656,30 +782,63 @@
       if (activeBtn) activeBtn.className = activeBtn.className.replace('bg-yellow-100/80 text-amber-950 border-amber-300', 'bg-amber-500 text-amber-950 shadow-md border-amber-600');
     }
 
-    // --- CLIENTE ---
-    function renderClientServicesSelect() {
-      const select = document.getElementById('clientService');
-      select.innerHTML = '<option value="">-- Selecciona un servicio --</option>';
-      services.forEach(s => {
-        select.innerHTML += `<option value="${s.id}">${s.name} - $${s.price}</option>`;
-      });
+    // --- CLIENTE: SELECCIÓN MÚLTIPLE Y PAQUETES ---
+    function renderClientServicesCheckboxes() {
+      const container = document.getElementById('clientServicesCheckboxes');
+      if (services.length === 0) {
+        container.innerHTML = '<p class="text-xs text-stone-500">No hay servicios disponibles.</p>';
+        return;
+      }
+
+      container.innerHTML = services.map(s => `
+        <label class="flex items-center justify-between p-2 hover:bg-amber-100/60 rounded-lg cursor-pointer border border-amber-200">
+          <div class="flex items-center space-x-2">
+            <input type="checkbox" name="selectedService" value="${s.id}" onchange="calculateMultiServiceTotal()" class="service-check rounded border-amber-400 text-amber-600 focus:ring-amber-500 w-4 h-4">
+            <span class="text-xs font-bold text-amber-950">${s.name} (${s.duration} min)</span>
+          </div>
+          <span class="text-xs font-black text-amber-900">$${parseFloat(s.price).toFixed(2)}</span>
+        </label>
+      `).join('');
     }
 
-    function updateServiceInfo() {
-      const id = document.getElementById('clientService').value;
-      const s = services.find(x => x.id === id);
+    function calculateMultiServiceTotal() {
+      const checkboxes = document.querySelectorAll('.service-check:checked');
       const badge = document.getElementById('serviceDetailBadge');
+      const promoBadge = document.getElementById('promoAppliedBadge');
 
-      if (s) {
-        document.getElementById('serviceDetailDesc').innerText = s.desc || 'Sin descripción adicional.';
-        document.getElementById('serviceDetailTime').innerText = `⏱ Duración: ${s.duration} min`;
-        document.getElementById('serviceDetailPrice').innerText = `💰 Precio: $${parseFloat(s.price).toFixed(2)}`;
-        document.getElementById('serviceDetailMinDeposit').innerText = `$${parseFloat(s.minDeposit || 0).toFixed(2)}`;
-        document.getElementById('serviceDetailRequirements').innerText = `Requisitos: ${s.requirements || 'Sin requisitos especiales.'}`;
-        badge.classList.remove('hidden');
-      } else {
+      if (checkboxes.length === 0) {
         badge.classList.add('hidden');
+        return;
       }
+
+      let totalPrice = 0;
+      let totalDuration = 0;
+      let minDepositTotal = 0;
+
+      checkboxes.forEach(chk => {
+        const s = services.find(x => x.id === chk.value);
+        if (s) {
+          totalPrice += parseFloat(s.price);
+          totalDuration += parseInt(s.duration);
+          minDepositTotal += parseFloat(s.minDeposit || (s.price * 0.3));
+        }
+      });
+
+      // Aplicar descuento por paquete si selecciona 2 o más servicios
+      let discountRate = 0;
+      if (checkboxes.length >= 2 && promoConfig.comboDiscount > 0) {
+        discountRate = promoConfig.comboDiscount / 100;
+        totalPrice = totalPrice * (1 - discountRate);
+        promoBadge.classList.remove('hidden');
+        promoBadge.innerText = `🎉 ¡Paquete de ${checkboxes.length} servicios! (${promoConfig.comboDiscount}% de descuento aplicado)`;
+      } else {
+        promoBadge.classList.add('hidden');
+      }
+
+      document.getElementById('multiServiceTime').innerText = `⏱ Duración Total: ${totalDuration} min`;
+      document.getElementById('multiServicePrice').innerText = `💰 Total: $${totalPrice.toFixed(2)}`;
+      document.getElementById('serviceDetailMinDeposit').innerText = `$${minDepositTotal.toFixed(2)}`;
+      badge.classList.remove('hidden');
     }
 
     function updateAvailableHours() {
@@ -707,7 +866,17 @@
 
     function renderClientCatalog() {
       const container = document.getElementById('clientCatalogList');
-      container.innerHTML = services.map(s => `
+      
+      let html = '';
+      if (promoConfig.bannerText) {
+        html += `
+          <div class="p-3 bg-amber-200 border border-amber-400 rounded-xl text-center text-xs font-black text-amber-950 shadow-sm animate-pulse">
+            ${promoConfig.bannerText}
+          </div>
+        `;
+      }
+
+      html += services.map(s => `
         <div class="p-4 bg-white/90 rounded-xl border border-amber-300 shadow-sm flex flex-col justify-between space-y-2">
           <div class="flex justify-between items-start">
             <h4 class="font-bold text-amber-950 text-sm flex items-center gap-1"><span>🌻</span> ${s.name}</h4>
@@ -720,13 +889,15 @@
           </div>
         </div>
       `).join('');
+
+      container.innerHTML = html;
       lucide.createIcons();
     }
 
     function renderClientPaymentAccounts() {
       const container = document.getElementById('paymentAccountsClientList');
       if (paymentAccounts.length === 0) {
-        container.innerHTML = '<p class="text-xs text-amber-800 col-span-2 text-center">No hay cuentas bancarias registradas por el momento.</p>';
+        container.innerHTML = '<p class="text-xs text-amber-800 col-span-2 text-center">No hay cuentas bancarias registradas.</p>';
         return;
       }
 
@@ -753,19 +924,40 @@
       e.preventDefault();
       const name = document.getElementById('clientName').value.trim();
       const phone = document.getElementById('clientPhone').value.trim();
-      const serviceId = document.getElementById('clientService').value;
+      const checkboxes = document.querySelectorAll('.service-check:checked');
       const date = document.getElementById('clientDate').value;
       const time = document.getElementById('clientTime').value;
       const notes = document.getElementById('clientNotes').value.trim();
 
-      const serviceObj = services.find(s => s.id === serviceId);
-      if (!serviceObj) return;
+      if (checkboxes.length === 0) {
+        alert('Por favor selecciona al menos un servicio.');
+        return;
+      }
+
+      let serviceNames = [];
+      let totalPrice = 0;
+      let minDepositTotal = 0;
+
+      checkboxes.forEach(chk => {
+        const s = services.find(x => x.id === chk.value);
+        if (s) {
+          serviceNames.push(s.name);
+          totalPrice += parseFloat(s.price);
+          minDepositTotal += parseFloat(s.minDeposit || 0);
+        }
+      });
+
+      if (checkboxes.length >= 2 && promoConfig.comboDiscount > 0) {
+        totalPrice = totalPrice * (1 - (promoConfig.comboDiscount / 100));
+      }
+
+      const serviceCombinedStr = serviceNames.join(' + ');
 
       const newApp = {
         id: 'app_' + Date.now(),
         name,
         phone,
-        service: serviceObj.name,
+        service: serviceCombinedStr,
         date,
         time,
         deposit: 0,
@@ -784,56 +976,98 @@
       const parts = date.split('-');
       const formattedDate = `${parts[2]}/${parts[1]}/${parts[0]}`;
 
-      downloadAppointmentTicket(newApp, serviceObj, formattedDate);
-
-      const text = `Hola, mi nombre es *${name}*. Acabo de agendar una cita para el servicio: *${serviceObj.name}* el día *${formattedDate}* a las *${time} hs*. Confirmo que acepté los requisitos y la política de puntualidad de 15 min antes. Quedo a la espera de enviar mi comprobante de anticipo ($${serviceObj.minDeposit || 0}). ✨🌻`;
+      const text = `Hola, mi nombre es *${name}*. Acabo de agendar una cita para: *${serviceCombinedStr}* el día *${formattedDate}* a las *${time} hs*. Quedo a la espera de enviar mi comprobante de anticipo. ✨🌻`;
       const waUrl = `https://wa.me/526674992354?text=${encodeURIComponent(text)}`;
 
-      alert('¡Cita agendada con éxito! Se ha descargado la Ficha de Requisitos de tu cita. Serás redirigido a WhatsApp para confirmar.');
+      alert('¡Cita agendada con éxito! Serás redirigido a WhatsApp para confirmar tu anticipo.');
       window.open(waUrl, '_blank');
 
       e.target.reset();
+      document.querySelectorAll('.service-check').forEach(c => c.checked = false);
       document.getElementById('serviceDetailBadge').classList.add('hidden');
       renderAdminAppointments();
+      renderAdminClientsList();
       checkAdminAlerts();
     }
 
-    function downloadAppointmentTicket(app, serviceObj, formattedDate) {
-      const content = `
-=====================================================
-          SPA DE DAMARIS VEGA 🌻
-   FICHA DE RESERVACIÓN & REQUISITOS DE CITA
-=====================================================
+    // --- BASE DE DATOS DE CLIENTES E HISTORIAL ---
+    function renderAdminClientsList() {
+      const container = document.getElementById('adminClientsList');
+      const search = document.getElementById('searchClientDb').value.toLowerCase();
 
-CLIENTE: ${app.name}
-TELÉFONO: ${app.phone}
-SERVICIO: ${serviceObj.name}
-FECHA: ${formattedDate}
-HORA DE LA CITA: ${app.time} hs
-PRECIO DEL SERVICIO: $${parseFloat(serviceObj.price).toFixed(2)}
-ANTICIPO MÍNIMO REQUERIDO: $${parseFloat(serviceObj.minDeposit || 0).toFixed(2)}
+      // Agrupar citas por teléfono del cliente
+      const clientsMap = {};
+      appointments.forEach(a => {
+        const phone = a.phone || 'Sin teléfono';
+        if (!clientsMap[phone]) {
+          clientsMap[phone] = {
+            name: a.name,
+            phone: phone,
+            appointments: []
+          };
+        }
+        clientsMap[phone].appointments.push(a);
+      });
 
------------------------------------------------------
-REQUISITOS PARA TU CITA:
------------------------------------------------------
-${serviceObj.requirements || 'Sin requisitos específicos.'}
+      let clientsArr = Object.values(clientsMap);
+      
+      // Ordenar citas de cada cliente por fecha (más reciente primero)
+      clientsArr.forEach(c => {
+        c.appointments.sort((x, y) => (y.date + y.time).localeCompare(x.date + x.time));
+      });
 
------------------------------------------------------
-POLÍTICAS IMPORTANTES DE PUNTUALIDAD Y CANCELACIÓN:
------------------------------------------------------
-1. Debes presentarte 15 MINUTOS ANTES de tu cita.
-2. Si llegas a la hora de tu cita o después (ejemplo: 3:05 PM para cita de 3:00 PM), la cita queda AUTOMÁTICAMENTE CANCELADA.
-3. NO HAY REEMBOLSOS del anticipo o dinero pagado por citas canceladas o llegadas tarde.
+      if (search) {
+        clientsArr = clientsArr.filter(c => c.name.toLowerCase().includes(search) || c.phone.includes(search));
+      }
 
-=====================================================
-  ¡Te esperamos para brindarte una excelente experiencia!
-=====================================================
-`;
-      const blob = new Blob([content], { type: 'text/plain;charset=utf-8' });
-      const a = document.createElement('a');
-      a.href = URL.createObjectURL(blob);
-      a.download = `Cita_Spa_${app.name.replace(/\s+/g, '_')}.txt`;
-      a.click();
+      document.getElementById('totalClientsCount').innerText = `${clientsArr.length} Clientes`;
+
+      if (clientsArr.length === 0) {
+        container.innerHTML = '<p class="text-xs text-amber-800 col-span-2 text-center">No hay clientes registrados en la base de datos.</p>';
+        return;
+      }
+
+      container.innerHTML = clientsArr.map(c => {
+        const lastApp = c.appointments[0];
+        const totalVisits = c.appointments.length;
+        
+        // Calcular tiempo desde la última cita
+        const lastDate = new Date(lastApp.date);
+        const today = new Date();
+        const diffTime = Math.abs(today - lastDate);
+        const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+        const diffMonths = (diffDays / 30).toFixed(1);
+
+        const promoMsg = `Hola ${c.name} 🌻. Notamos que tu última cita en el Spa de Damaris Vega fue hace ${diffDays > 30 ? diffMonths + ' meses' : diffDays + ' días'}. Te queremos regalar una promoción especial en tu próximo masaje o facial. ¡Te esperamos!`;
+        const waPromoUrl = `https://wa.me/52${c.phone.replace(/\D/g, '')}?text=${encodeURIComponent(promoMsg)}`;
+
+        return `
+          <div class="bg-white/95 p-4 rounded-xl border border-amber-300 shadow-sm space-y-3">
+            <div class="flex justify-between items-start border-b border-amber-100 pb-2">
+              <div>
+                <h4 class="font-bold text-amber-950 text-sm">🌻 ${c.name}</h4>
+                <p class="text-xs text-amber-800">Tel: ${c.phone}</p>
+              </div>
+              <span class="text-[10px] font-extrabold px-2 py-0.5 rounded-full bg-amber-100 text-amber-900 border border-amber-300">
+                ${totalVisits} visita(s)
+              </span>
+            </div>
+
+            <div class="text-xs text-stone-700 space-y-1">
+              <p>📌 <strong>Última cita:</strong> ${lastApp.service} (${lastApp.date})</p>
+              <p class="text-amber-900 italic">Tiempo transcurrido: ${diffDays > 30 ? diffMonths + ' meses' : diffDays + ' días'}</p>
+            </div>
+
+            <div class="pt-2 border-t border-amber-100 flex justify-end">
+              <a href="${waPromoUrl}" target="_blank" class="px-3 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold rounded-lg flex items-center space-x-1 shadow-sm">
+                <i data-lucide="message-circle" class="w-3.5 h-3.5"></i>
+                <span>Enviar Promo por WhatsApp</span>
+              </a>
+            </div>
+          </div>
+        `;
+      }).join('');
+      lucide.createIcons();
     }
 
     // --- ADMINISTRADOR ---
@@ -917,12 +1151,12 @@ POLÍTICAS IMPORTANTES DE PUNTUALIDAD Y CANCELACIÓN:
 
             <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 text-xs">
               <div>
-                <span class="text-amber-700 block font-bold">Servicio</span>
+                <span class="text-amber-700 block font-bold">Servicio(s)</span>
                 <span class="font-bold text-amber-950">${a.service}</span>
               </div>
               
               <div>
-                <span class="text-amber-700 block font-bold">Fecha & Hora (Editable)</span>
+                <span class="text-amber-700 block font-bold">Fecha & Hora</span>
                 <div class="flex items-center space-x-1 mt-0.5">
                   <input type="date" value="${a.date}" onchange="updateAppointmentDate('${a.id}', this.value)" class="text-xs font-bold border border-amber-300 rounded px-1.5 py-0.5 bg-yellow-50 text-amber-950 w-full">
                   <input type="time" value="${a.time}" onchange="updateAppointmentTime('${a.id}', this.value)" class="text-xs font-bold border border-amber-300 rounded px-1.5 py-0.5 bg-yellow-50 text-amber-950">
@@ -930,7 +1164,7 @@ POLÍTICAS IMPORTANTES DE PUNTUALIDAD Y CANCELACIÓN:
               </div>
 
               <div>
-                <span class="text-amber-700 block font-bold">Anticipo Registrado ($)</span>
+                <span class="text-amber-700 block font-bold">Anticipo ($)</span>
                 <input type="number" step="0.01" value="${a.deposit || 0}" onchange="updateDeposit('${a.id}', this.value)" class="w-full px-2 py-0.5 border border-amber-300 rounded font-bold text-emerald-800 bg-yellow-50 mt-0.5">
               </div>
 
@@ -941,17 +1175,6 @@ POLÍTICAS IMPORTANTES DE PUNTUALIDAD Y CANCELACIÓN:
                   <option value="Anticipo" ${a.paymentStatus === 'Anticipo' ? 'selected' : ''}>Anticipo Aceptado</option>
                   <option value="Pagado Completo" ${a.paymentStatus === 'Pagado Completo' ? 'selected' : ''}>Pagado Completo</option>
                 </select>
-              </div>
-            </div>
-
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-3 text-xs bg-yellow-50/80 p-3 rounded-xl border border-amber-200">
-              <div>
-                <span class="text-amber-900 block font-bold">Notas del Cliente:</span>
-                <p class="text-stone-700 italic">${a.notes || 'Sin notas del cliente.'}</p>
-              </div>
-              <div>
-                <span class="text-amber-900 block font-bold">Notas del Administrador (Editables):</span>
-                <input type="text" value="${a.adminNotes || ''}" onchange="updateAdminNotes('${a.id}', this.value)" placeholder="Escribir nota privada..." class="w-full px-2 py-1 text-xs border border-amber-300 rounded bg-white mt-1">
               </div>
             </div>
 
@@ -998,15 +1221,6 @@ POLÍTICAS IMPORTANTES DE PUNTUALIDAD Y CANCELACIÓN:
       }
     }
 
-    function updateAdminNotes(id, val) {
-      const app = appointments.find(a => a.id === id);
-      if (app) {
-        app.adminNotes = val;
-        localStorage.setItem('spa_appointments', JSON.stringify(appointments));
-        if (isFirebaseActive && firebase.database) firebase.database().ref('citas/' + id).update({ adminNotes: val });
-      }
-    }
-
     function sendFollowUpWhatsApp(id) {
       const app = appointments.find(a => a.id === id);
       if (!app) return;
@@ -1014,7 +1228,7 @@ POLÍTICAS IMPORTANTES DE PUNTUALIDAD Y CANCELACIÓN:
       const parts = app.date.split('-');
       const formattedDate = `${parts[2]}/${parts[1]}/${parts[0]}`;
 
-      const text = `Hola, buenos días ${app.name} 🌻. Te hablamos del *Spa de Damaris Vega*. Veo que estás interesado(a) en nuestro servicio de *${app.service}* para la fecha *${formattedDate}* a las *${app.time} hs*. Te contactamos para confirmar tu asistencia y brindarte los detalles de tu cita. Recuerda estar 15 min antes. ✨💆‍♀️`;
+      const text = `Hola, buenos días ${app.name} 🌻. Te hablamos del *Spa de Damaris Vega* para confirmar tu cita de *${app.service}* el día *${formattedDate}* a las *${app.time} hs*. ¡Te esperamos 15 min antes! ✨💆‍♀️`;
       window.open(`https://wa.me/52${cleanPhone}?text=${encodeURIComponent(text)}`, '_blank');
     }
 
@@ -1034,11 +1248,12 @@ POLÍTICAS IMPORTANTES DE PUNTUALIDAD Y CANCELACIÓN:
         localStorage.setItem('spa_appointments', JSON.stringify(appointments));
         if (isFirebaseActive && firebase.database) firebase.database().ref('citas/' + id).remove();
         renderAdminAppointments();
+        renderAdminClientsList();
         checkAdminAlerts();
       }
     }
 
-    // --- SERVICIOS ADMIN ---
+    // --- GESTIÓN Y EDICIÓN DE SERVICIOS Y PROMOCIONES ---
     function renderAdminServicesList() {
       const container = document.getElementById('adminServicesList');
       container.innerHTML = services.map(s => `
@@ -1054,8 +1269,9 @@ POLÍTICAS IMPORTANTES DE PUNTUALIDAD Y CANCELACIÓN:
               <p class="text-stone-500 font-normal italic">Requisitos: ${s.requirements || 'Ninguno'}</p>
             </div>
           </div>
-          <div class="text-right border-t border-amber-100 pt-2">
-            <button onclick="deleteService('${s.id}')" class="text-xs text-red-700 font-bold hover:underline">Eliminar</button>
+          <div class="flex justify-end space-x-3 border-t border-amber-100 pt-2 text-xs">
+            <button onclick="editService('${s.id}')" class="text-amber-900 font-bold hover:underline">Editar</button>
+            <button onclick="deleteService('${s.id}')" class="text-red-700 font-bold hover:underline">Eliminar</button>
           </div>
         </div>
       `).join('');
@@ -1064,6 +1280,7 @@ POLÍTICAS IMPORTANTES DE PUNTUALIDAD Y CANCELACIÓN:
 
     function saveService(e) {
       e.preventDefault();
+      const id = document.getElementById('editServiceId').value;
       const name = document.getElementById('serviceName').value.trim();
       const price = parseFloat(document.getElementById('servicePrice').value);
       const minDeposit = parseFloat(document.getElementById('serviceMinDeposit').value) || 0;
@@ -1071,26 +1288,77 @@ POLÍTICAS IMPORTANTES DE PUNTUALIDAD Y CANCELACIÓN:
       const desc = document.getElementById('serviceDesc').value.trim();
       const requirements = document.getElementById('serviceRequirements').value.trim();
 
-      services.push({ id: 's_' + Date.now(), name, price, minDeposit, duration, desc, requirements });
-      localStorage.setItem('spa_services', JSON.stringify(services));
+      if (id) {
+        // Editar existente
+        const idx = services.findIndex(s => s.id === id);
+        if (idx !== -1) {
+          services[idx] = { id, name, price, minDeposit, duration, desc, requirements };
+        }
+      } else {
+        // Crear nuevo
+        services.push({ id: 's_' + Date.now(), name, price, minDeposit, duration, desc, requirements });
+      }
 
-      e.target.reset();
-      renderClientServicesSelect();
+      localStorage.setItem('spa_services', JSON.stringify(services));
+      resetServiceForm();
+      renderClientServicesCheckboxes();
       renderClientCatalog();
       renderAdminServicesList();
+      alert('¡Servicio guardado correctamente!');
+    }
+
+    function editService(id) {
+      const s = services.find(x => x.id === id);
+      if (!s) return;
+
+      document.getElementById('editServiceId').value = s.id;
+      document.getElementById('serviceName').value = s.name;
+      document.getElementById('servicePrice').value = s.price;
+      document.getElementById('serviceMinDeposit').value = s.minDeposit || '';
+      document.getElementById('serviceDuration').value = s.duration;
+      document.getElementById('serviceDesc').value = s.desc || '';
+      document.getElementById('serviceRequirements').value = s.requirements || '';
+
+      document.getElementById('serviceFormTitle').innerText = 'Editar Servicio';
+      document.getElementById('serviceSubmitBtnText').innerText = 'Actualizar Servicio';
+      document.getElementById('cancelEditServiceBtn').classList.remove('hidden');
+    }
+
+    function resetServiceForm() {
+      document.getElementById('editServiceId').value = '';
+      document.querySelector('form').reset();
+      document.getElementById('serviceFormTitle').innerText = 'Agregar / Editar Servicio';
+      document.getElementById('serviceSubmitBtnText').innerText = 'Guardar Servicio';
+      document.getElementById('cancelEditServiceBtn').classList.add('hidden');
     }
 
     function deleteService(id) {
       if (confirm('¿Eliminar servicio del catálogo?')) {
         services = services.filter(s => s.id !== id);
         localStorage.setItem('spa_services', JSON.stringify(services));
-        renderClientServicesSelect();
+        renderClientServicesCheckboxes();
         renderClientCatalog();
         renderAdminServicesList();
       }
     }
 
-    // --- CUENTAS ADMIN (SINCRONIZADAS EN TIEMPO REAL CON FIREBASE) ---
+    function savePromoConfig(e) {
+      e.preventDefault();
+      const comboDiscount = parseFloat(document.getElementById('comboDiscount').value) || 0;
+      const bannerText = document.getElementById('promoBannerText').value.trim();
+
+      promoConfig = { comboDiscount, bannerText };
+      localStorage.setItem('spa_promo_config', JSON.stringify(promoConfig));
+      alert('¡Configuración de promociones guardada con éxito!');
+      renderClientCatalog();
+    }
+
+    function loadPromoConfigToForm() {
+      document.getElementById('comboDiscount').value = promoConfig.comboDiscount || '';
+      document.getElementById('promoBannerText').value = promoConfig.bannerText || '';
+    }
+
+    // --- CUENTAS ADMIN ---
     function renderAdminAccountsList() {
       const container = document.getElementById('adminAccountsList');
       if (paymentAccounts.length === 0) {
