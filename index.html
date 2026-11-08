@@ -436,7 +436,7 @@
           <div class="bg-yellow-50/95 backdrop-blur-md p-6 rounded-2xl border border-amber-300 shadow-xl space-y-4">
             <div class="flex justify-between items-center border-b border-amber-200 pb-3">
               <h2 class="text-lg font-bold font-serif-title text-amber-950">Catálogo de Servicios Activos</h2>
-              <span class="text-xs font-bold text-amber-800 bg-yellow-200 px-3 py-1 rounded-full border border-amber-300">🌻 Editar o Eliminar</span>
+              <span class="text-xs font-bold text-amber-800 bg-yellow-200 px-3 py-1 rounded-full border border-amber-300">🌻 Sincronizado en la Nube</span>
             </div>
             
             <div id="adminServicesList" class="grid grid-cols-1 gap-3 max-h-[500px] overflow-y-auto pr-1">
@@ -573,7 +573,6 @@
     let paymentAccounts = JSON.parse(localStorage.getItem('spa_payment_accounts')) || defaultAccounts;
     let promoConfig = JSON.parse(localStorage.getItem('spa_promo_config')) || { comboDiscount: 10, bannerText: '✨ ¡15% de descuento este fin de semana al registrarte! ✨' };
     
-    // Sesión persistente y contraseña
     let adminPassword = localStorage.getItem('spa_admin_pass') || '1234';
     let isAdminLoggedIn = localStorage.getItem('spa_admin_session') === 'true';
     let currentAdminFilter = 'all';
@@ -612,7 +611,7 @@
       }
     }
 
-    // LISTENER EN TIEMPO REAL (CITAS Y CUENTAS)
+    // LISTENER EN TIEMPO REAL (CITAS, CUENTAS Y SERVICIOS)
     function initRealtimeListener() {
       if (isFirebaseActive && firebase.database) {
         // Citas en tiempo real
@@ -641,6 +640,24 @@
           }
           renderClientPaymentAccounts();
           renderAdminAccountsList();
+        });
+
+        // Catálogo de Servicios en tiempo real (Firebase)
+        const dbRefServicios = firebase.database().ref('servicios');
+        dbRefServicios.on('value', (snapshot) => {
+          const data = snapshot.val();
+          if (data) {
+            services = Object.values(data);
+            localStorage.setItem('spa_services', JSON.stringify(services));
+          } else {
+            services = defaultServices;
+            services.forEach(s => {
+              firebase.database().ref('servicios/' + s.id).set(s);
+            });
+          }
+          renderClientServicesCheckboxes();
+          renderClientCatalog();
+          renderAdminServicesList();
         });
       }
     }
@@ -824,7 +841,6 @@
         }
       });
 
-      // Aplicar descuento por paquete si selecciona 2 o más servicios
       let discountRate = 0;
       if (checkboxes.length >= 2 && promoConfig.comboDiscount > 0) {
         discountRate = promoConfig.comboDiscount / 100;
@@ -995,7 +1011,6 @@
       const container = document.getElementById('adminClientsList');
       const search = document.getElementById('searchClientDb').value.toLowerCase();
 
-      // Agrupar citas por teléfono del cliente
       const clientsMap = {};
       appointments.forEach(a => {
         const phone = a.phone || 'Sin teléfono';
@@ -1011,7 +1026,6 @@
 
       let clientsArr = Object.values(clientsMap);
       
-      // Ordenar citas de cada cliente por fecha (más reciente primero)
       clientsArr.forEach(c => {
         c.appointments.sort((x, y) => (y.date + y.time).localeCompare(x.date + x.time));
       });
@@ -1031,7 +1045,6 @@
         const lastApp = c.appointments[0];
         const totalVisits = c.appointments.length;
         
-        // Calcular tiempo desde la última cita
         const lastDate = new Date(lastApp.date);
         const today = new Date();
         const diffTime = Math.abs(today - lastDate);
@@ -1280,7 +1293,7 @@
 
     function saveService(e) {
       e.preventDefault();
-      const id = document.getElementById('editServiceId').value;
+      const id = document.getElementById('editServiceId').value || ('s_' + Date.now());
       const name = document.getElementById('serviceName').value.trim();
       const price = parseFloat(document.getElementById('servicePrice').value);
       const minDeposit = parseFloat(document.getElementById('serviceMinDeposit').value) || 0;
@@ -1288,15 +1301,18 @@
       const desc = document.getElementById('serviceDesc').value.trim();
       const requirements = document.getElementById('serviceRequirements').value.trim();
 
-      if (id) {
-        // Editar existente
-        const idx = services.findIndex(s => s.id === id);
-        if (idx !== -1) {
-          services[idx] = { id, name, price, minDeposit, duration, desc, requirements };
-        }
+      const serviceObj = { id, name, price, minDeposit, duration, desc, requirements };
+
+      // Guardar en Firebase para sincronizar en tiempo real con todos los dispositivos
+      if (isFirebaseActive && firebase.database) {
+        firebase.database().ref('servicios/' + id).set(serviceObj);
+      }
+
+      const idx = services.findIndex(s => s.id === id);
+      if (idx !== -1) {
+        services[idx] = serviceObj;
       } else {
-        // Crear nuevo
-        services.push({ id: 's_' + Date.now(), name, price, minDeposit, duration, desc, requirements });
+        services.push(serviceObj);
       }
 
       localStorage.setItem('spa_services', JSON.stringify(services));
@@ -1304,7 +1320,7 @@
       renderClientServicesCheckboxes();
       renderClientCatalog();
       renderAdminServicesList();
-      alert('¡Servicio guardado correctamente!');
+      alert('¡Servicio guardado y sincronizado correctamente en la nube!');
     }
 
     function editService(id) {
@@ -1336,6 +1352,11 @@
       if (confirm('¿Eliminar servicio del catálogo?')) {
         services = services.filter(s => s.id !== id);
         localStorage.setItem('spa_services', JSON.stringify(services));
+
+        if (isFirebaseActive && firebase.database) {
+          firebase.database().ref('servicios/' + id).remove();
+        }
+
         renderClientServicesCheckboxes();
         renderClientCatalog();
         renderAdminServicesList();
