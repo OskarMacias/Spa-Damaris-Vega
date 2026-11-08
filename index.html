@@ -1,460 +1,3 @@
-<!DOCTYPE html>
-<html lang="es">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Spa de Damaris Vega - Agendar Cita</title>
-  <!-- Tailwind CSS CDN -->
-  <script src="https://cdn.tailwindcss.com"></script>
-  <!-- Lucide Icons CDN -->
-  <script src="https://unpkg.com/lucide@latest"></script>
-  
-  <!-- Firebase SDKs Compatibles para Tiempo Real -->
-  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
-
-  <style>
-    @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,500;0,700;1,400&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap');
-    
-    body {
-      font-family: 'Plus Jakarta Sans', sans-serif;
-      background: linear-gradient(to bottom, rgba(253, 251, 247, 0.94), rgba(254, 243, 199, 0.95)), 
-                  url('https://images.unsplash.com/photo-1540555700478-4be289fbecef?auto=format&fit=crop&w=1920&q=80') center/cover fixed no-repeat;
-      color: #3B3322;
-      min-height: 100vh;
-    }
-    
-    .font-serif-title {
-      font-family: 'Playfair Display', serif;
-    }
-
-    .spa-hero-bg {
-      background: linear-gradient(to right, rgba(254, 240, 138, 0.9), rgba(253, 230, 138, 0.85)), 
-                  url('https://images.unsplash.com/photo-1544161515-4ab6ce6db874?auto=format&fit=crop&w=1600&q=80') center/cover no-repeat;
-    }
-
-    .empty-state-bg {
-      background: linear-gradient(to bottom, rgba(255, 255, 255, 0.92), rgba(254, 243, 199, 0.95)),
-                  url('https://images.unsplash.com/photo-1600334089648-b0d9d3028eb2?auto=format&fit=crop&w=800&q=80') center/cover no-repeat;
-    }
-
-    .admin-only-tab {
-      display: none !important;
-    }
-
-    @keyframes popIn {
-      0% { transform: translateY(-100%); opacity: 0; }
-      100% { transform: translateY(0); opacity: 1; }
-    }
-    .animate-pop-in {
-      animation: popIn 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
-    }
-
-    ::-webkit-scrollbar {
-      width: 6px;
-      height: 6px;
-    }
-    ::-webkit-scrollbar-track {
-      background: #FEF08A;
-    }
-    ::-webkit-scrollbar-thumb {
-      background: #EAB308;
-      border-radius: 4px;
-    }
-  </style>
-</head>
-<body class="min-h-screen flex flex-col antialiased selection:bg-amber-200 selection:text-amber-950">
-
-  <!-- NOTIFICACIÓN DE COPIADO AL PORTAPAPELES -->
-  <div id="copyToast" class="hidden fixed bottom-5 left-1/2 transform -translate-x-1/2 z-50 bg-stone-900 text-yellow-300 px-4 py-2 rounded-xl text-xs font-bold shadow-xl border border-amber-500 transition-all">
-    📋 ¡Número copiado al portapapeles!
-  </div>
-
-  <!-- AVISO EN TIEMPO REAL (POPUP FLOTANTE DE NUEVA CITA) -->
-  <div id="realtimeNotification" class="hidden fixed top-4 left-1/2 transform -translate-x-1/2 z-50 w-[92%] max-w-lg bg-amber-500 text-amber-950 p-4 rounded-2xl shadow-2xl border-2 border-amber-600 animate-pop-in">
-    <div class="flex items-start justify-between gap-3">
-      <div class="flex items-start space-x-3">
-        <div class="p-2 bg-yellow-300 rounded-xl text-amber-950 border border-amber-600">
-          <i data-lucide="bell" class="w-6 h-6 animate-bounce"></i>
-        </div>
-        <div class="space-y-1">
-          <p class="text-xs font-black uppercase tracking-wider text-amber-950">🔔 ¡NUEVA CITA AGENDADA EN TIEMPO REAL!</p>
-          <p id="rtNotifDetails" class="text-xs font-bold text-amber-950">Cargando detalles...</p>
-        </div>
-      </div>
-      <button onclick="closeRealtimeNotif()" class="text-amber-950 hover:text-amber-900 p-1">
-        <i data-lucide="x" class="w-5 h-5"></i>
-      </button>
-    </div>
-    <button onclick="goToNewAppointment()" class="mt-3 w-full bg-amber-950 text-yellow-300 hover:bg-amber-900 py-2 rounded-xl text-xs font-extrabold flex items-center justify-center space-x-1.5 shadow-md">
-      <span>Presiona aquí para visualizar la cita</span>
-      <i data-lucide="arrow-right" class="w-4 h-4"></i>
-    </button>
-  </div>
-
-  <!-- TOP HEADER -->
-  <header class="bg-amber-400 text-amber-950 border-b-2 border-amber-500 shadow-md sticky top-0 z-30">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between">
-      
-      <div class="flex items-center space-x-3">
-        <div class="w-12 h-12 rounded-full bg-yellow-300 border-2 border-amber-600 flex items-center justify-center shadow-md p-1.5">
-          <i data-lucide="sun" class="w-7 h-7 text-amber-800"></i>
-        </div>
-        <div>
-          <h1 class="text-xl md:text-2xl font-bold font-serif-title tracking-wide flex items-center gap-2">
-            Spa de Damaris Vega 🌻
-          </h1>
-          <p class="text-[11px] font-bold tracking-wider uppercase text-amber-900">Salud • Masajes • Relajación & Estética</p>
-        </div>
-      </div>
-
-      <div class="flex items-center space-x-3">
-        <span id="roleBadge" class="hidden sm:inline-flex items-center px-3 py-1 rounded-full text-xs font-extrabold bg-amber-100 text-amber-900 border border-amber-300">
-          👤 Cliente
-        </span>
-        
-        <button id="btnAdminAuth" onclick="toggleAdminAuth()" class="px-3.5 py-1.5 bg-amber-950 hover:bg-amber-900 text-yellow-300 text-xs font-bold rounded-xl shadow-md transition-all flex items-center space-x-1.5 border border-amber-800">
-          <i data-lucide="lock" class="w-3.5 h-3.5"></i>
-          <span id="btnAdminText">Admin</span>
-        </button>
-      </div>
-
-    </div>
-  </header>
-
-  <!-- BANNER ENCABEZADO -->
-  <div class="spa-hero-bg border-b border-amber-300 py-6 px-4 text-center shadow-inner">
-    <div class="max-w-3xl mx-auto space-y-2">
-      <div class="inline-flex items-center space-x-2 bg-yellow-400/90 text-amber-950 px-3 py-1 rounded-full text-xs font-bold border border-yellow-500 shadow-sm">
-        <span>🌻 Centro Holístico & Spa</span>
-      </div>
-      <h2 class="text-2xl md:text-3xl font-serif-title font-bold text-amber-950">Reserva tu Experiencia de Relajación</h2>
-      <p class="text-xs md:text-sm font-semibold text-amber-950">Selecciona tu masaje o tratamiento facial preferido y agenda tu horario disponible.</p>
-    </div>
-  </div>
-
-  <!-- ALERTA DE CITAS DE HOY -->
-  <div id="alertBannerAdmin" class="hidden bg-gradient-to-r from-amber-500 via-yellow-500 to-amber-600 text-amber-950 shadow-md">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3 flex flex-col md:flex-row items-center justify-between gap-3">
-      <div class="flex items-center space-x-3">
-        <div class="p-2 bg-yellow-200/80 rounded-lg">
-          <i data-lucide="bell-ring" class="w-6 h-6 text-amber-950 animate-bounce"></i>
-        </div>
-        <div>
-          <p class="text-xs uppercase tracking-wider font-extrabold">PANEL ADMIN: Citas de Hoy 🌻</p>
-          <p id="alertBannerText" class="text-sm font-medium">Tienes citas agendadas para el día de hoy.</p>
-        </div>
-      </div>
-      <button onclick="switchTab('admin-appointments')" class="px-4 py-1.5 bg-amber-950 text-yellow-300 hover:bg-amber-900 text-xs font-bold rounded-lg transition-colors shadow-sm flex items-center justify-center space-x-1">
-        <span>Revisar Citas</span>
-        <i data-lucide="arrow-right" class="w-3.5 h-3.5"></i>
-      </button>
-    </div>
-  </div>
-
-  <!-- CONTENEDOR PRINCIPAL -->
-  <main class="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-6">
-
-    <!-- PESTAÑAS DE NAVEGACIÓN -->
-    <div class="flex flex-wrap gap-2 border-b border-amber-300/70 pb-2">
-      <button onclick="switchTab('client-book')" id="tab-client-book" class="tab-btn px-4 py-2 rounded-xl text-xs sm:text-sm font-bold flex items-center space-x-2 transition-all bg-amber-500 text-amber-950 shadow-md border border-amber-600">
-        <i data-lucide="calendar-plus" class="w-4 h-4"></i>
-        <span>Agendar Cita</span>
-      </button>
-
-      <button onclick="switchTab('client-payments')" id="tab-client-payments" class="tab-btn px-4 py-2 rounded-xl text-xs sm:text-sm font-bold flex items-center space-x-2 transition-all text-amber-950 bg-yellow-100/80 hover:bg-amber-200 border border-amber-300">
-        <i data-lucide="credit-card" class="w-4 h-4"></i>
-        <span>Métodos de Pago</span>
-      </button>
-
-      <button onclick="switchTab('admin-appointments')" id="tab-admin-appointments" class="admin-only-tab tab-btn px-4 py-2 rounded-xl text-xs sm:text-sm font-bold flex items-center space-x-2 transition-all text-amber-950 bg-yellow-100/80 hover:bg-amber-200 border border-amber-300">
-        <i data-lucide="clipboard-list" class="w-4 h-4 text-amber-800"></i>
-        <span>📋 Panel de Citas</span>
-      </button>
-
-      <button onclick="switchTab('admin-services')" id="tab-admin-services" class="admin-only-tab tab-btn px-4 py-2 rounded-xl text-xs sm:text-sm font-bold flex items-center space-x-2 transition-all text-amber-950 bg-yellow-100/80 hover:bg-amber-200 border border-amber-300">
-        <i data-lucide="settings" class="w-4 h-4 text-amber-800"></i>
-        <span>⚙️ Gestión de Servicios</span>
-      </button>
-
-      <button onclick="switchTab('admin-payment-config')" id="tab-admin-payment-config" class="admin-only-tab tab-btn px-4 py-2 rounded-xl text-xs sm:text-sm font-bold flex items-center space-x-2 transition-all text-amber-950 bg-yellow-100/80 hover:bg-amber-200 border border-amber-300">
-        <i data-lucide="wallet" class="w-4 h-4 text-amber-800"></i>
-        <span>💳 Configurar Cuentas</span>
-      </button>
-    </div>
-
-    <!-- VISTA 1: CLIENTE - AGENDAR CITA -->
-    <section id="sec-client-book" class="space-y-6">
-      <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
-
-        <div class="lg:col-span-6 bg-yellow-50/95 backdrop-blur-md p-6 rounded-2xl border border-amber-300 shadow-xl space-y-4">
-          <div class="flex items-center justify-between border-b border-amber-200 pb-3">
-            <div class="flex items-center space-x-2">
-              <i data-lucide="sparkles" class="w-5 h-5 text-amber-700"></i>
-              <h2 class="text-lg font-bold font-serif-title text-amber-950">Ingresa tus datos para agendar</h2>
-            </div>
-            <span class="text-xl">🌻</span>
-          </div>
-
-          <form id="bookingForm" onsubmit="handleClientBooking(event)" class="space-y-4">
-            <div>
-              <label class="block text-xs font-bold text-amber-900 mb-1">Nombre Completo *</label>
-              <input type="text" id="clientName" required placeholder="Ej. Ana Patricia Gómez" class="w-full px-3.5 py-2 rounded-xl border border-amber-300 text-sm focus:outline-none focus:ring-2 focus:ring-amber-500 bg-white/90">
-            </div>
-
-            <div>
-              <label class="block text-xs font-bold text-amber-900 mb-1">Teléfono WhatsApp (10 dígitos) *</label>
-              <input type="tel" id="clientPhone" required placeholder="Ej. 6671234567" pattern="[0-9]{10}" class="w-full px-3.5 py-2 rounded-xl border border-amber-300 text-sm focus:outline-none focus:ring-2 focus:ring-amber-500 bg-white/90">
-            </div>
-
-            <div>
-              <label class="block text-xs font-bold text-amber-900 mb-1">Selecciona tu Servicio o Masaje *</label>
-              <select id="clientService" required onchange="updateServiceInfo()" class="w-full px-3.5 py-2 rounded-xl border border-amber-300 text-sm focus:outline-none focus:ring-2 focus:ring-amber-500 bg-white/90 font-medium text-amber-950">
-              </select>
-            </div>
-
-            <div id="serviceDetailBadge" class="hidden p-3.5 bg-amber-100/90 rounded-xl border border-amber-300 text-xs text-amber-900 space-y-2">
-              <p id="serviceDetailDesc" class="italic">Descripción del servicio...</p>
-              <div class="flex justify-between font-bold pt-1 text-amber-950 border-t border-amber-200">
-                <span id="serviceDetailTime">⏱ Duración: -- min</span>
-                <span id="serviceDetailPrice" class="text-amber-900">💰 Precio: $--</span>
-              </div>
-              <div class="bg-amber-200/90 p-2 rounded-lg border border-amber-400 font-extrabold text-amber-950 flex items-center justify-between">
-                <span>💵 Anticipo Mínimo Requerido:</span>
-                <span id="serviceDetailMinDeposit" class="text-sm font-black text-rose-900">$0.00</span>
-              </div>
-              <p id="serviceDetailRequirements" class="text-[11px] text-stone-700 font-semibold italic">Requisitos: Ninguno</p>
-            </div>
-
-            <div class="grid grid-cols-2 gap-3">
-              <div>
-                <label class="block text-xs font-bold text-amber-900 mb-1">Fecha deseada *</label>
-                <input type="date" id="clientDate" required onchange="updateAvailableHours()" class="w-full px-3.5 py-2 rounded-xl border border-amber-300 text-sm focus:outline-none focus:ring-2 focus:ring-amber-500 bg-white/90">
-              </div>
-              <div>
-                <label class="block text-xs font-bold text-amber-900 mb-1">Hora disponible *</label>
-                <select id="clientTime" required class="w-full px-3.5 py-2 rounded-xl border border-amber-300 text-sm focus:outline-none focus:ring-2 focus:ring-amber-500 bg-white/90 font-medium text-amber-950">
-                  <option value="">Selecciona fecha primero</option>
-                </select>
-              </div>
-            </div>
-
-            <div>
-              <label class="block text-xs font-bold text-amber-900 mb-1">Notas especiales o preferencia (Opcional)</label>
-              <textarea id="clientNotes" rows="2" placeholder="Ej. Alergia a aceites de nuez, preferencia de presión..." class="w-full px-3.5 py-2 rounded-xl border border-amber-300 text-sm focus:outline-none focus:ring-2 focus:ring-amber-500 bg-white/90"></textarea>
-            </div>
-
-            <div class="p-3 bg-red-50 border border-red-300 rounded-xl space-y-2 text-xs text-red-950">
-              <p class="font-bold flex items-center gap-1 text-red-900">
-                <i data-lucide="alert-triangle" class="w-4 h-4 text-red-700"></i>
-                <span>Políticas de Asistencia y Tolerancia:</span>
-              </p>
-              <ul class="list-disc pl-4 space-y-1 text-[11px] font-semibold text-stone-800">
-                <li>Debes acudir <strong>15 minutos antes</strong> de tu cita.</li>
-                <li>Si llegas pasadas la hora de tu cita (ejemplo 3:05 PM para cita de 3:00 PM), la cita queda <strong>automáticamente cancelada</strong>.</li>
-                <li><strong>NO hay reembolsos</strong> del anticipo o pago en citas canceladas o impuntuales.</li>
-              </ul>
-              
-              <label class="flex items-start space-x-2 pt-1 cursor-pointer">
-                <input type="checkbox" id="termsCheck" required class="mt-0.5 rounded border-red-400 text-amber-600 focus:ring-amber-500">
-                <span class="text-[11px] font-bold text-red-900 leading-tight">Acepto los requisitos, puntualidad y la política de NO reembolso por cancelación o impuntualidad. *</span>
-              </label>
-            </div>
-
-            <button type="submit" class="w-full bg-amber-500 hover:bg-amber-600 text-amber-950 font-bold py-3 rounded-xl text-sm transition-all shadow-md flex items-center justify-center space-x-2 border border-amber-600">
-              <i data-lucide="download" class="w-4 h-4"></i>
-              <span>Agendar, Descargar Ficha y Confirmar</span>
-            </button>
-          </form>
-        </div>
-
-        <div class="lg:col-span-6 space-y-4">
-          <div class="bg-yellow-50/95 backdrop-blur-md p-6 rounded-2xl border border-amber-300 shadow-xl space-y-4">
-            <h3 class="text-lg font-bold font-serif-title text-amber-950 border-b border-amber-200 pb-2 flex items-center gap-2">
-              <span>💆‍♀️</span> Nuestros Servicios Destacados
-            </h3>
-            <div id="clientCatalogList" class="space-y-3 max-h-[540px] overflow-y-auto pr-1">
-            </div>
-          </div>
-        </div>
-
-      </div>
-    </section>
-
-    <!-- VISTA 2: CLIENTE - MÉTODOS DE PAGO (CON BOTÓN DE COPIAR) -->
-    <section id="sec-client-payments" class="hidden space-y-6">
-      <div class="max-w-3xl mx-auto bg-yellow-50/95 backdrop-blur-md p-6 rounded-2xl border border-amber-300 shadow-xl space-y-6">
-        <div class="text-center space-y-2 border-b border-amber-200 pb-4">
-          <div class="w-12 h-12 mx-auto bg-amber-400 border border-amber-500 rounded-full flex items-center justify-center text-amber-950 shadow-md">
-            <i data-lucide="credit-card" class="w-6 h-6"></i>
-          </div>
-          <h2 class="text-xl font-bold font-serif-title text-amber-950">Métodos de Pago & Cuentas Disponibles</h2>
-          <p class="text-xs text-amber-900">Para asegurar tu cita, puedes realizar tu pago o anticipo a cualquiera de las siguientes cuentas autorizadas.</p>
-        </div>
-
-        <div id="paymentAccountsClientList" class="grid grid-cols-1 md:grid-cols-2 gap-4">
-        </div>
-
-        <div class="bg-amber-100/90 p-4 rounded-xl border border-amber-300 text-xs text-amber-950 space-y-2">
-          <p class="font-bold flex items-center gap-1"><span>📲</span> Envío de Comprobante:</p>
-          <p>Una vez realizado tu anticipo, por favor presiona el botón de abajo para enviar la captura del comprobante por WhatsApp y confirmar tu lugar.</p>
-          <a href="https://wa.me/526674992354?text=Hola,%20adjunto%20mi%20comprobante%20de%20pago%20para%20confirmar%20mi%20cita%20en%20el%20Spa." target="_blank" class="inline-flex items-center space-x-2 bg-emerald-600 hover:bg-emerald-700 text-white font-bold px-4 py-2 rounded-xl text-xs shadow-md transition-colors">
-            <i data-lucide="message-circle" class="w-4 h-4"></i>
-            <span>Enviar Comprobante por WhatsApp</span>
-          </a>
-        </div>
-      </div>
-    </section>
-
-    <!-- VISTA 3: ADMIN - PANEL DE CITAS -->
-    <section id="sec-admin-appointments" class="hidden space-y-6">
-      <div class="bg-yellow-50/95 backdrop-blur-md p-4 rounded-2xl border border-amber-300 shadow-lg space-y-3">
-        <div class="flex flex-col sm:flex-row items-center justify-between gap-3">
-          <div class="relative flex-1 w-full">
-            <i data-lucide="search" class="w-4 h-4 text-amber-600 absolute left-3 top-1/2 transform -translate-y-1/2"></i>
-            <input type="text" id="searchApp" oninput="renderAdminAppointments()" placeholder="Buscar por cliente o teléfono..." class="w-full pl-9 pr-3 py-2 bg-white/90 border border-amber-300 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-amber-500">
-          </div>
-          <input type="date" id="filterDate" onchange="renderAdminAppointments()" class="w-full sm:w-auto px-2.5 py-2 bg-white/90 border border-amber-300 rounded-xl text-xs font-bold text-amber-900">
-        </div>
-
-        <div class="flex flex-wrap gap-2 pt-1 border-t border-amber-200/80">
-          <button id="btnFilterAll" onclick="setFilterStatus('all')" class="px-3 py-1.5 bg-amber-500 text-amber-950 font-bold text-xs rounded-lg border border-amber-600 transition-all">
-            Todas
-          </button>
-          <button id="btnFilterToday" onclick="setFilterStatus('today')" class="px-3 py-1.5 bg-yellow-200 text-amber-950 font-bold text-xs rounded-lg border border-amber-300 hover:bg-yellow-300 transition-all">
-            🌻 Citas de Hoy
-          </button>
-          <button id="btnFilterConfirmed" onclick="setFilterStatus('confirmed')" class="px-3 py-1.5 bg-emerald-100 text-emerald-950 font-bold text-xs rounded-lg border border-emerald-300 hover:bg-emerald-200 transition-all">
-            ✅ Con Anticipo / Confirmadas
-          </button>
-          <button id="btnFilterPending" onclick="setFilterStatus('pending')" class="px-3 py-1.5 bg-amber-100 text-amber-900 font-bold text-xs rounded-lg border border-amber-300 hover:bg-amber-200 transition-all">
-            ⏳ Pendientes de Confirmar
-          </button>
-        </div>
-      </div>
-
-      <div id="adminAppointmentsList" class="space-y-3">
-      </div>
-    </section>
-
-    <!-- VISTA 4: ADMIN - GESTIÓN DE SERVICIOS -->
-    <section id="sec-admin-services" class="hidden space-y-6">
-      <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
-
-        <div class="lg:col-span-4 bg-yellow-50/95 backdrop-blur-md p-6 rounded-2xl border border-amber-300 shadow-xl space-y-4">
-          <div class="flex items-center space-x-2 border-b border-amber-200 pb-3">
-            <i data-lucide="plus-circle" class="w-5 h-5 text-amber-700"></i>
-            <h2 class="text-lg font-bold font-serif-title text-amber-950">Agregar / Editar Servicio</h2>
-          </div>
-
-          <form onsubmit="saveService(event)" class="space-y-4">
-            <div>
-              <label class="block text-xs font-bold text-amber-900 mb-1">Nombre del Servicio *</label>
-              <input type="text" id="serviceName" required placeholder="Ej. Masaje Descontracturante" class="w-full px-3.5 py-2 rounded-xl border border-amber-300 text-sm focus:outline-none focus:ring-2 focus:ring-amber-500 bg-white/90">
-            </div>
-
-            <div class="grid grid-cols-3 gap-2">
-              <div>
-                <label class="block text-xs font-bold text-amber-900 mb-1">Precio ($) *</label>
-                <input type="number" id="servicePrice" required min="0" step="0.01" placeholder="500" class="w-full px-2.5 py-2 rounded-xl border border-amber-300 text-sm focus:outline-none focus:ring-2 focus:ring-amber-500 bg-white/90">
-              </div>
-              <div>
-                <label class="block text-xs font-bold text-amber-900 mb-1">Anticipo Min ($)</label>
-                <input type="number" id="serviceMinDeposit" required min="0" step="0.01" placeholder="150" class="w-full px-2.5 py-2 rounded-xl border border-amber-300 text-sm focus:outline-none focus:ring-2 focus:ring-amber-500 bg-white/90">
-              </div>
-              <div>
-                <label class="block text-xs font-bold text-amber-900 mb-1">Minutos *</label>
-                <input type="number" id="serviceDuration" required min="1" placeholder="60" class="w-full px-2.5 py-2 rounded-xl border border-amber-300 text-sm focus:outline-none focus:ring-2 focus:ring-amber-500 bg-white/90">
-              </div>
-            </div>
-
-            <div>
-              <label class="block text-xs font-bold text-amber-900 mb-1">Descripción corta</label>
-              <textarea id="serviceDesc" rows="2" placeholder="Incluye aromaterapia, aceites relajantes..." class="w-full px-3.5 py-2 rounded-xl border border-amber-300 text-sm focus:outline-none focus:ring-2 focus:ring-amber-500 bg-white/90"></textarea>
-            </div>
-
-            <div>
-              <label class="block text-xs font-bold text-amber-900 mb-1">Requisitos para el Cliente (Ficha)</label>
-              <textarea id="serviceRequirements" rows="2" placeholder="Ej. Venir con rostro sin maquillaje, ropa cómoda..." class="w-full px-3.5 py-2 rounded-xl border border-amber-300 text-sm focus:outline-none focus:ring-2 focus:ring-amber-500 bg-white/90"></textarea>
-            </div>
-
-            <button type="submit" class="w-full bg-amber-500 hover:bg-amber-600 text-amber-950 font-bold py-2.5 rounded-xl text-sm transition-all shadow-md flex items-center justify-center space-x-2 border border-amber-600">
-              <i data-lucide="save" class="w-4 h-4"></i>
-              <span>Guardar Servicio</span>
-            </button>
-          </form>
-        </div>
-
-        <div class="lg:col-span-8">
-          <div class="bg-yellow-50/95 backdrop-blur-md p-6 rounded-2xl border border-amber-300 shadow-xl space-y-4">
-            <div class="flex justify-between items-center border-b border-amber-200 pb-3">
-              <h2 class="text-lg font-bold font-serif-title text-amber-950">Catálogo de Servicios Activos</h2>
-              <span class="text-xs font-bold text-amber-800 bg-yellow-200 px-3 py-1 rounded-full border border-amber-300">🌻 Menú Spa</span>
-            </div>
-            
-            <div id="adminServicesList" class="grid grid-cols-1 md:grid-cols-2 gap-4">
-            </div>
-          </div>
-        </div>
-
-      </div>
-    </section>
-
-    <!-- VISTA 5: ADMIN - CONFIGURACIÓN DE CUENTAS DE PAGO -->
-    <section id="sec-admin-payment-config" class="hidden space-y-6">
-      <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
-
-        <div class="lg:col-span-4 bg-yellow-50/95 backdrop-blur-md p-6 rounded-2xl border border-amber-300 shadow-xl space-y-4">
-          <div class="flex items-center space-x-2 border-b border-amber-200 pb-3">
-            <i data-lucide="plus-circle" class="w-5 h-5 text-amber-700"></i>
-            <h2 class="text-lg font-bold font-serif-title text-amber-950">Agregar Nueva Cuenta Bancaria</h2>
-          </div>
-
-          <form onsubmit="savePaymentAccount(event)" class="space-y-4">
-            <div>
-              <label class="block text-xs font-bold text-amber-900 mb-1">Nombre de la Institución o Método *</label>
-              <input type="text" id="accBank" required placeholder="Ej. BBVA BANCOMER / DEPÓSITO EN OXXO" class="w-full px-3.5 py-2 rounded-xl border border-amber-300 text-sm focus:outline-none focus:ring-2 focus:ring-amber-500 bg-white/90">
-            </div>
-
-            <div>
-              <label class="block text-xs font-bold text-amber-900 mb-1">Titular de la Cuenta *</label>
-              <input type="text" id="accOwner" required placeholder="Ej. Damaris Vega" class="w-full px-3.5 py-2 rounded-xl border border-amber-300 text-sm focus:outline-none focus:ring-2 focus:ring-amber-500 bg-white/90">
-            </div>
-
-            <div>
-              <label class="block text-xs font-bold text-amber-900 mb-1">Número de Cuenta / CLABE / Tarjeta *</label>
-              <input type="text" id="accNumber" required placeholder="Ej. CLABE: 012730015... o Tarjeta: 4152..." class="w-full px-3.5 py-2 rounded-xl border border-amber-300 text-sm focus:outline-none focus:ring-2 focus:ring-amber-500 bg-white/90">
-            </div>
-
-            <div>
-              <label class="block text-xs font-bold text-amber-900 mb-1">Instrucciones o Notas adicionales</label>
-              <textarea id="accNotes" rows="2" placeholder="Ej. Enviar foto del recibo por WhatsApp al 6674992354..." class="w-full px-3.5 py-2 rounded-xl border border-amber-300 text-sm focus:outline-none focus:ring-2 focus:ring-amber-500 bg-white/90"></textarea>
-            </div>
-
-            <button type="submit" class="w-full bg-amber-500 hover:bg-amber-600 text-amber-950 font-bold py-2.5 rounded-xl text-sm transition-all shadow-md flex items-center justify-center space-x-2 border border-amber-600">
-              <i data-lucide="save" class="w-4 h-4"></i>
-              <span>Guardar Cuenta</span>
-            </button>
-          </form>
-        </div>
-
-        <div class="lg:col-span-8">
-          <div class="bg-yellow-50/95 backdrop-blur-md p-6 rounded-2xl border border-amber-300 shadow-xl space-y-4">
-            <div class="flex justify-between items-center border-b border-amber-200 pb-3">
-              <h2 class="text-lg font-bold font-serif-title text-amber-950">Cuentas y Tarjetas Registradas</h2>
-              <span class="text-xs font-bold text-amber-800 bg-yellow-200 px-3 py-1 rounded-full border border-amber-300">💳 Visibles para el Cliente</span>
-            </div>
-            
-            <div id="adminAccountsList" class="grid grid-cols-1 md:grid-cols-2 gap-4">
-            </div>
-          </div>
-        </div>
-
-      </div>
-    </section>
-
-  </main>
-
   <script>
     const firebaseConfig = {
       apiKey: "AIzaSyBaUfzgkdvOJ6CKoDgO5uAbTrstQ3T4xyw",
@@ -513,11 +56,12 @@
       document.getElementById('clientDate').min = today;
     }
 
-    // LISTENER EN TIEMPO REAL
+    // LISTENER EN TIEMPO REAL (CITAS Y CUENTAS)
     function initRealtimeListener() {
       if (isFirebaseActive && firebase.database) {
-        const dbRef = firebase.database().ref('citas');
-        dbRef.on('child_added', (snapshot) => {
+        // Citas en tiempo real
+        const dbRefCitas = firebase.database().ref('citas');
+        dbRefCitas.on('child_added', (snapshot) => {
           const newApp = snapshot.val();
           if (newApp && !appointments.some(a => a.id === newApp.id)) {
             appointments.push(newApp);
@@ -525,6 +69,18 @@
             renderAdminAppointments();
             checkAdminAlerts();
             triggerRealtimePopup(newApp);
+          }
+        });
+
+        // Cuentas de pago en tiempo real
+        const dbRefCuentas = firebase.database().ref('cuentas');
+        dbRefCuentas.on('value', (snapshot) => {
+          const data = snapshot.val();
+          if (data) {
+            paymentAccounts = Object.values(data);
+            localStorage.setItem('spa_payment_accounts', JSON.stringify(paymentAccounts));
+            renderClientPaymentAccounts();
+            renderAdminAccountsList();
           }
         });
       }
@@ -557,9 +113,7 @@
       }
     }
 
-    // FUNCIÓN DE COPIADO AL PORTAPAPELES PARA CLIENTES
     function copyToClipboard(text) {
-      // Extraer únicamente los dígitos para facilitar la transferencia
       const cleanNum = text.replace(/[^0-9]/g, '');
       const textToCopy = cleanNum.length > 5 ? cleanNum : text;
 
@@ -702,7 +256,6 @@
       lucide.createIcons();
     }
 
-    // RENDERS CON BOTÓN DE COPIAR CUENTA INTEGRADAS
     function renderClientPaymentAccounts() {
       const container = document.getElementById('paymentAccountsClientList');
       if (paymentAccounts.length === 0) {
@@ -1070,7 +623,7 @@ POLÍTICAS IMPORTANTES DE PUNTUALIDAD Y CANCELACIÓN:
       }
     }
 
-    // --- CUENTAS ADMIN ---
+    // --- CUENTAS ADMIN (SINCRONIZADAS EN TIEMPO REAL CON FIREBASE) ---
     function renderAdminAccountsList() {
       const container = document.getElementById('adminAccountsList');
       if (paymentAccounts.length === 0) {
@@ -1100,8 +653,13 @@ POLÍTICAS IMPORTANTES DE PUNTUALIDAD Y CANCELACIÓN:
       const number = document.getElementById('accNumber').value.trim();
       const notes = document.getElementById('accNotes').value.trim();
 
-      paymentAccounts.push({ id: 'acc_' + Date.now(), bank, owner, number, notes });
+      const newAccount = { id: 'acc_' + Date.now(), bank, owner, number, notes };
+      paymentAccounts.push(newAccount);
       localStorage.setItem('spa_payment_accounts', JSON.stringify(paymentAccounts));
+
+      if (isFirebaseActive && firebase.database) {
+        firebase.database().ref('cuentas/' + newAccount.id).set(newAccount);
+      }
 
       e.target.reset();
       renderClientPaymentAccounts();
@@ -1112,6 +670,11 @@ POLÍTICAS IMPORTANTES DE PUNTUALIDAD Y CANCELACIÓN:
       if (confirm('¿Deseas eliminar esta cuenta de pago?')) {
         paymentAccounts = paymentAccounts.filter(a => a.id !== id);
         localStorage.setItem('spa_payment_accounts', JSON.stringify(paymentAccounts));
+
+        if (isFirebaseActive && firebase.database) {
+          firebase.database().ref('cuentas/' + id).remove();
+        }
+
         renderClientPaymentAccounts();
         renderAdminAccountsList();
       }
@@ -1133,5 +696,3 @@ POLÍTICAS IMPORTANTES DE PUNTUALIDAD Y CANCELACIÓN:
       }
     }
   </script>
-</body>
-</html>
