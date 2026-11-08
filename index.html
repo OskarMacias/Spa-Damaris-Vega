@@ -126,15 +126,20 @@
         <span>Métodos de Pago</span>
       </button>
 
-      <!-- Pestañas Exclusivas de Administrador (Ocultas por defecto) -->
-      <button onclick="switchTab('admin-appointments')" id="tab-admin-appointments" class="hidden tab-btn px-4 py-2 rounded-xl text-xs sm:text-sm font-bold flex items-center space-x-2 transition-all text-amber-950 bg-yellow-100/80 hover:bg-amber-200 border border-amber-300">
+      <!-- Pestañas Exclusivas de Administrador (Totalmente ocultas por defecto en Modo Cliente) -->
+      <button onclick="switchTab('admin-appointments')" id="tab-admin-appointments" class="hidden tab-btn px-4 py-2 rounded-xl text-xs sm:text-sm font-bold items-center space-x-2 transition-all text-amber-950 bg-yellow-100/80 hover:bg-amber-200 border border-amber-300">
         <i data-lucide="clipboard-list" class="w-4 h-4 text-amber-800"></i>
         <span>📋 Panel de Citas (Admin)</span>
       </button>
 
-      <button onclick="switchTab('admin-services')" id="tab-admin-services" class="hidden tab-btn px-4 py-2 rounded-xl text-xs sm:text-sm font-bold flex items-center space-x-2 transition-all text-amber-950 bg-yellow-100/80 hover:bg-amber-200 border border-amber-300">
+      <button onclick="switchTab('admin-services')" id="tab-admin-services" class="hidden tab-btn px-4 py-2 rounded-xl text-xs sm:text-sm font-bold items-center space-x-2 transition-all text-amber-950 bg-yellow-100/80 hover:bg-amber-200 border border-amber-300">
         <i data-lucide="settings" class="w-4 h-4 text-amber-800"></i>
         <span>⚙️ Gestión de Servicios</span>
+      </button>
+
+      <button onclick="switchTab('admin-payment-config')" id="tab-admin-payment-config" class="hidden tab-btn px-4 py-2 rounded-xl text-xs sm:text-sm font-bold items-center space-x-2 transition-all text-amber-950 bg-yellow-100/80 hover:bg-amber-200 border border-amber-300">
+        <i data-lucide="wallet" class="w-4 h-4 text-amber-800"></i>
+        <span>💳 Configurar Cuentas</span>
       </button>
     </div>
 
@@ -218,31 +223,19 @@
       </div>
     </section>
 
-    <!-- VISTA 2: CLIENTE - MÉTODOS DE PAGO -->
+    <!-- VISTA 2: CLIENTE - MÉTODOS DE PAGO (DINÁMICO) -->
     <section id="sec-client-payments" class="hidden space-y-6">
       <div class="max-w-3xl mx-auto bg-yellow-50/95 backdrop-blur-md p-6 rounded-2xl border border-amber-300 shadow-xl space-y-6">
         <div class="text-center space-y-2 border-b border-amber-200 pb-4">
           <div class="w-12 h-12 mx-auto bg-amber-400 border border-amber-500 rounded-full flex items-center justify-center text-amber-950 shadow-md">
             <i data-lucide="credit-card" class="w-6 h-6"></i>
           </div>
-          <h2 class="text-xl font-bold font-serif-title text-amber-950">Métodos de Pago & Anticipos</h2>
-          <p class="text-xs text-amber-900">Para asegurar tu cita, puedes realizar tu pago o anticipo mediante transferencia bancaria o en efectivo.</p>
+          <h2 class="text-xl font-bold font-serif-title text-amber-950">Métodos de Pago & Cuentas Disponibles</h2>
+          <p class="text-xs text-amber-900">Para asegurar tu cita, puedes realizar tu pago o anticipo a cualquiera de las siguientes cuentas autorizadas.</p>
         </div>
 
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div class="bg-white p-4 rounded-xl border border-amber-300 shadow-sm space-y-2">
-            <span class="text-xs font-bold text-amber-800 uppercase tracking-wider block">Transferencia Bancaria</span>
-            <p class="text-sm font-bold text-amber-950">BBVA BANCOMER</p>
-            <p class="text-xs text-stone-600">Titular: <span class="font-bold text-amber-950">Damaris Vega</span></p>
-            <p class="text-xs text-stone-600">CLABE: <span class="font-mono font-bold text-amber-900">012 730 015 123 456 789</span></p>
-          </div>
-
-          <div class="bg-white p-4 rounded-xl border border-amber-300 shadow-sm space-y-2">
-            <span class="text-xs font-bold text-amber-800 uppercase tracking-wider block">Depósito en OXXO / Efectivo</span>
-            <p class="text-sm font-bold text-amber-950">Número de Tarjeta</p>
-            <p class="text-mono font-bold text-amber-900 text-sm">4152 3138 9012 3456</p>
-            <p class="text-xs text-stone-500">Enviar el recibo o foto por WhatsApp después de transferir.</p>
-          </div>
+        <div id="paymentAccountsClientList" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <!-- Renderizado dinámico de las cuentas configuradas -->
         </div>
 
         <div class="bg-amber-100/90 p-4 rounded-xl border border-amber-300 text-xs text-amber-950 space-y-2">
@@ -337,6 +330,62 @@
       </div>
     </section>
 
+    <!-- VISTA 5: ADMIN - CONFIGURACIÓN DE CUENTAS DE PAGO (SÓLO ADMIN) -->
+    <section id="sec-admin-payment-config" class="hidden space-y-6">
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+
+        <!-- Formulario Cuentas -->
+        <div class="lg:col-span-4 bg-yellow-50/95 backdrop-blur-md p-6 rounded-2xl border border-amber-300 shadow-xl space-y-4">
+          <div class="flex items-center space-x-2 border-b border-amber-200 pb-3">
+            <i data-lucide="plus-circle" class="w-5 h-5 text-amber-700"></i>
+            <h2 class="text-lg font-bold font-serif-title text-amber-950">Agregar Nueva Cuenta Bancaria</h2>
+          </div>
+
+          <form onsubmit="savePaymentAccount(event)" class="space-y-4">
+            <div>
+              <label class="block text-xs font-bold text-amber-900 mb-1">Nombre de la Institución o Método *</label>
+              <input type="text" id="accBank" required placeholder="Ej. BBVA Bancomer / Depósito OXXO" class="w-full px-3.5 py-2 rounded-xl border border-amber-300 text-sm focus:outline-none focus:ring-2 focus:ring-amber-500 bg-white/90">
+            </div>
+
+            <div>
+              <label class="block text-xs font-bold text-amber-900 mb-1">Titular de la Cuenta *</label>
+              <input type="text" id="accOwner" required placeholder="Ej. Damaris Vega" class="w-full px-3.5 py-2 rounded-xl border border-amber-300 text-sm focus:outline-none focus:ring-2 focus:ring-amber-500 bg-white/90">
+            </div>
+
+            <div>
+              <label class="block text-xs font-bold text-amber-900 mb-1">Número de Cuenta / CLABE / Tarjeta *</label>
+              <input type="text" id="accNumber" required placeholder="Ej. CLABE: 012730015... o Tarjeta: 4152..." class="w-full px-3.5 py-2 rounded-xl border border-amber-300 text-sm focus:outline-none focus:ring-2 focus:ring-amber-500 bg-white/90">
+            </div>
+
+            <div>
+              <label class="block text-xs font-bold text-amber-900 mb-1">Instrucciones o Notas adicionales</label>
+              <textarea id="accNotes" rows="2" placeholder="Ej. Enviar foto del recibo de OXXO por WhatsApp..." class="w-full px-3.5 py-2 rounded-xl border border-amber-300 text-sm focus:outline-none focus:ring-2 focus:ring-amber-500 bg-white/90"></textarea>
+            </div>
+
+            <button type="submit" class="w-full bg-amber-500 hover:bg-amber-600 text-amber-950 font-bold py-2.5 rounded-xl text-sm transition-all shadow-md flex items-center justify-center space-x-2 border border-amber-600">
+              <i data-lucide="save" class="w-4 h-4"></i>
+              <span>Guardar Cuenta</span>
+            </button>
+          </form>
+        </div>
+
+        <!-- Lista Cuentas Configuradas -->
+        <div class="lg:col-span-8">
+          <div class="bg-yellow-50/95 backdrop-blur-md p-6 rounded-2xl border border-amber-300 shadow-xl space-y-4">
+            <div class="flex justify-between items-center border-b border-amber-200 pb-3">
+              <h2 class="text-lg font-bold font-serif-title text-amber-950">Cuentas y Tarjetas Registradas</h2>
+              <span class="text-xs font-bold text-amber-800 bg-yellow-200 px-3 py-1 rounded-full border border-amber-300">💳 Visibles para el Cliente</span>
+            </div>
+            
+            <div id="adminAccountsList" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <!-- Dinámico -->
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
   </main>
 
   <script>
@@ -346,10 +395,16 @@
       { id: 's3', name: 'Masaje con Piedras Volcánicas Calientes', price: 600, duration: 75, desc: 'Terapia térmica muscular profunda para aliviar la tensión del cuerpo.' }
     ];
 
+    const defaultAccounts = [
+      { id: 'acc1', bank: 'BBVA BANCOMER', owner: 'Damaris Vega', number: 'CLABE: 012 730 015 123 456 789', notes: 'Transferencia directa o de cualquier banco.' },
+      { id: 'acc2', bank: 'DEPÓSITO EN OXXO / EFECTIVO', owner: 'Damaris Vega', number: 'Tarjeta: 4152 3138 9012 3456', notes: 'Enviar recibo o foto por WhatsApp después de depositar.' }
+    ];
+
     const availableTimeSlots = ["09:00", "10:30", "12:00", "14:00", "15:30", "17:00", "18:30"];
 
     let services = JSON.parse(localStorage.getItem('spa_services')) || defaultServices;
     let appointments = JSON.parse(localStorage.getItem('spa_appointments')) || [];
+    let paymentAccounts = JSON.parse(localStorage.getItem('spa_payment_accounts')) || defaultAccounts;
     let isAdminLoggedIn = false;
 
     document.addEventListener('DOMContentLoaded', () => {
@@ -357,8 +412,10 @@
       setMinDateToday();
       renderClientServicesSelect();
       renderClientCatalog();
+      renderClientPaymentAccounts();
       renderAdminServicesList();
       renderAdminAppointments();
+      renderAdminAccountsList();
       checkAdminAlerts();
     });
 
@@ -373,18 +430,26 @@
         isAdminLoggedIn = false;
         document.getElementById('roleBadge').innerText = "👤 Modo Cliente";
         document.getElementById('btnAdminText').innerText = "Acceso Admin";
-        document.getElementById('tab-admin-appointments').classList.add('hidden');
-        document.getElementById('tab-admin-services').classList.add('hidden');
+        
+        // Ocultar pestañas de administración
+        document.getElementById('tab-admin-appointments').classList.replace('flex', 'hidden');
+        document.getElementById('tab-admin-services').classList.replace('flex', 'hidden');
+        document.getElementById('tab-admin-payment-config').classList.replace('flex', 'hidden');
         document.getElementById('alertBannerAdmin').classList.add('hidden');
+
         switchTab('client-book');
       } else {
         const pass = prompt('Ingresa la contraseña de Administrador:');
-        if (pass === '1234') { // Contraseña por defecto 1234
+        if (pass === '1234') { // Contraseña por defecto: 1234
           isAdminLoggedIn = true;
           document.getElementById('roleBadge').innerText = "🔑 Administrador";
           document.getElementById('btnAdminText').innerText = "Cerrar Sesión Admin";
-          document.getElementById('tab-admin-appointments').classList.remove('hidden');
-          document.getElementById('tab-admin-services').classList.remove('hidden');
+          
+          // Mostrar pestañas de administración
+          document.getElementById('tab-admin-appointments').classList.replace('hidden', 'flex');
+          document.getElementById('tab-admin-services').classList.replace('hidden', 'flex');
+          document.getElementById('tab-admin-payment-config').classList.replace('hidden', 'flex');
+
           checkAdminAlerts();
           switchTab('admin-appointments');
         } else if (pass !== null) {
@@ -395,7 +460,7 @@
 
     // --- CAMBIO DE PESTAÑAS ---
     function switchTab(tabId) {
-      const tabs = ['client-book', 'client-payments', 'admin-appointments', 'admin-services'];
+      const tabs = ['client-book', 'client-payments', 'admin-appointments', 'admin-services', 'admin-payment-config'];
       tabs.forEach(t => {
         const sec = document.getElementById(`sec-${t}`);
         const btn = document.getElementById(`tab-${t}`);
@@ -471,6 +536,23 @@
       lucide.createIcons();
     }
 
+    function renderClientPaymentAccounts() {
+      const container = document.getElementById('paymentAccountsClientList');
+      if (paymentAccounts.length === 0) {
+        container.innerHTML = '<p class="text-xs text-amber-800 col-span-2 text-center">No hay cuentas bancarias registradas por el momento.</p>';
+        return;
+      }
+
+      container.innerHTML = paymentAccounts.map(acc => `
+        <div class="bg-white p-4 rounded-xl border border-amber-300 shadow-sm space-y-2">
+          <span class="text-xs font-bold text-amber-800 uppercase tracking-wider block">${acc.bank}</span>
+          <p class="text-xs text-stone-600">Titular: <span class="font-bold text-amber-950">${acc.owner}</span></p>
+          <p class="text-sm font-mono font-bold text-amber-900 bg-yellow-50 p-2 rounded-lg border border-amber-200">${acc.number}</p>
+          ${acc.notes ? `<p class="text-xs text-stone-500 italic">${acc.notes}</p>` : ''}
+        </div>
+      `).join('');
+    }
+
     function handleClientBooking(e) {
       e.preventDefault();
       const name = document.getElementById('clientName').value.trim();
@@ -498,7 +580,6 @@
       appointments.push(newApp);
       localStorage.setItem('spa_appointments', JSON.stringify(appointments));
 
-      // Generar WhatsApp directo para el cliente
       const cleanPhone = phone.replace(/\D/g, '');
       const parts = date.split('-');
       const formattedDate = `${parts[2]}/${parts[1]}/${parts[0]}`;
@@ -675,6 +756,53 @@
         renderClientServicesSelect();
         renderClientCatalog();
         renderAdminServicesList();
+      }
+    }
+
+    // --- GESTIÓN DE CUENTAS DE PAGO ADMIN ---
+    function renderAdminAccountsList() {
+      const container = document.getElementById('adminAccountsList');
+      if (paymentAccounts.length === 0) {
+        container.innerHTML = '<p class="text-xs text-amber-800 col-span-2">No hay cuentas configuradas.</p>';
+        return;
+      }
+
+      container.innerHTML = paymentAccounts.map(acc => `
+        <div class="p-4 bg-white/90 rounded-xl border border-amber-300 shadow-sm flex flex-col justify-between space-y-2">
+          <div>
+            <span class="text-xs font-bold text-amber-800 uppercase tracking-wider block">${acc.bank}</span>
+            <p class="text-xs text-stone-600">Titular: <span class="font-bold text-amber-950">${acc.owner}</span></p>
+            <p class="text-xs font-mono font-bold text-amber-900 mt-1">${acc.number}</p>
+            ${acc.notes ? `<p class="text-xs text-stone-500 italic mt-1">${acc.notes}</p>` : ''}
+          </div>
+          <div class="text-right border-t border-amber-100 pt-2">
+            <button onclick="deletePaymentAccount('${acc.id}')" class="text-xs text-red-700 font-bold hover:underline">Eliminar Cuenta</button>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    function savePaymentAccount(e) {
+      e.preventDefault();
+      const bank = document.getElementById('accBank').value.trim();
+      const owner = document.getElementById('accOwner').value.trim();
+      const number = document.getElementById('accNumber').value.trim();
+      const notes = document.getElementById('accNotes').value.trim();
+
+      paymentAccounts.push({ id: 'acc_' + Date.now(), bank, owner, number, notes });
+      localStorage.setItem('spa_payment_accounts', JSON.stringify(paymentAccounts));
+
+      e.target.reset();
+      renderClientPaymentAccounts();
+      renderAdminAccountsList();
+    }
+
+    function deletePaymentAccount(id) {
+      if (confirm('¿Deseas eliminar esta cuenta de pago?')) {
+        paymentAccounts = paymentAccounts.filter(a => a.id !== id);
+        localStorage.setItem('spa_payment_accounts', JSON.stringify(paymentAccounts));
+        renderClientPaymentAccounts();
+        renderAdminAccountsList();
       }
     }
 
