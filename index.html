@@ -273,23 +273,35 @@
       </div>
     </section>
 
-    <!-- VISTA 3: ADMIN - PANEL DE CITAS -->
+    <!-- VISTA 3: ADMIN - PANEL DE CITAS (CON FILTROS DE ESTADO) -->
     <section id="sec-admin-appointments" class="hidden space-y-6">
-      <div class="bg-yellow-50/95 backdrop-blur-md p-4 rounded-2xl border border-amber-300 shadow-lg flex flex-col sm:flex-row items-center justify-between gap-3">
-        <div class="relative flex-1 w-full">
-          <i data-lucide="search" class="w-4 h-4 text-amber-600 absolute left-3 top-1/2 transform -translate-y-1/2"></i>
-          <input type="text" id="searchApp" oninput="renderAdminAppointments()" placeholder="Buscar por cliente o teléfono..." class="w-full pl-9 pr-3 py-2 bg-white/90 border border-amber-300 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-amber-500">
+      <div class="bg-yellow-50/95 backdrop-blur-md p-4 rounded-2xl border border-amber-300 shadow-lg space-y-3">
+        
+        <!-- Buscador y fecha -->
+        <div class="flex flex-col sm:flex-row items-center justify-between gap-3">
+          <div class="relative flex-1 w-full">
+            <i data-lucide="search" class="w-4 h-4 text-amber-600 absolute left-3 top-1/2 transform -translate-y-1/2"></i>
+            <input type="text" id="searchApp" oninput="renderAdminAppointments()" placeholder="Buscar por cliente o teléfono..." class="w-full pl-9 pr-3 py-2 bg-white/90 border border-amber-300 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-amber-500">
+          </div>
+          <input type="date" id="filterDate" onchange="renderAdminAppointments()" class="w-full sm:w-auto px-2.5 py-2 bg-white/90 border border-amber-300 rounded-xl text-xs font-bold text-amber-900">
         </div>
 
-        <div class="flex items-center space-x-2 w-full sm:w-auto">
-          <button onclick="setFilterDate('today')" class="px-3 py-1.5 bg-amber-400 text-amber-950 border border-amber-500 text-xs font-bold rounded-lg hover:bg-amber-500">
-            🌻 Citas de Hoy
-          </button>
-          <button onclick="setFilterDate('all')" class="px-3 py-1.5 bg-yellow-200 text-amber-950 border border-amber-300 text-xs font-bold rounded-lg hover:bg-yellow-300">
+        <!-- Botones de Filtro por Estado y Fecha -->
+        <div class="flex flex-wrap gap-2 pt-1 border-t border-amber-200/80">
+          <button id="btnFilterAll" onclick="setFilterStatus('all')" class="px-3 py-1.5 bg-amber-500 text-amber-950 font-bold text-xs rounded-lg border border-amber-600 transition-all">
             Todas
           </button>
-          <input type="date" id="filterDate" onchange="renderAdminAppointments()" class="px-2.5 py-1 bg-white/90 border border-amber-300 rounded-lg text-xs font-bold text-amber-900">
+          <button id="btnFilterToday" onclick="setFilterStatus('today')" class="px-3 py-1.5 bg-yellow-200 text-amber-950 font-bold text-xs rounded-lg border border-amber-300 hover:bg-yellow-300 transition-all">
+            🌻 Citas de Hoy
+          </button>
+          <button id="btnFilterConfirmed" onclick="setFilterStatus('confirmed')" class="px-3 py-1.5 bg-emerald-100 text-emerald-950 font-bold text-xs rounded-lg border border-emerald-300 hover:bg-emerald-200 transition-all">
+            ✅ Con Anticipo / Confirmadas
+          </button>
+          <button id="btnFilterPending" onclick="setFilterStatus('pending')" class="px-3 py-1.5 bg-amber-100 text-amber-900 font-bold text-xs rounded-lg border border-amber-300 hover:bg-amber-200 transition-all">
+            ⏳ Pendientes de Confirmar
+          </button>
         </div>
+
       </div>
 
       <div id="adminAppointmentsList" class="space-y-3">
@@ -432,6 +444,7 @@
     let appointments = JSON.parse(localStorage.getItem('spa_appointments')) || [];
     let paymentAccounts = JSON.parse(localStorage.getItem('spa_payment_accounts')) || defaultAccounts;
     let isAdminLoggedIn = false;
+    let currentAdminFilter = 'all';
 
     document.addEventListener('DOMContentLoaded', () => {
       lucide.createIcons();
@@ -610,10 +623,8 @@
       const parts = date.split('-');
       const formattedDate = `${parts[2]}/${parts[1]}/${parts[0]}`;
 
-      // 1. Descargar Ficha Informativa / Comprobante
       downloadAppointmentTicket(newApp, serviceObj, formattedDate);
 
-      // 2. Abrir WhatsApp
       const text = `Hola, mi nombre es *${name}*. Acabo de agendar una cita para el servicio: *${serviceObj.name}* el día *${formattedDate}* a las *${time} hs*. Confirmo que acepté los requisitos y la política de puntualidad de 15 min antes. Quedo a la espera de enviar mi comprobante de anticipo ($${serviceObj.minDeposit || 0}). ✨🌻`;
       const waUrl = `https://wa.me/526674992354?text=${encodeURIComponent(text)}`;
 
@@ -626,7 +637,6 @@
       checkAdminAlerts();
     }
 
-    // DESCARGAR FICHA / FICHA EN TEXTO
     function downloadAppointmentTicket(app, serviceObj, formattedDate) {
       const content = `
 =====================================================
@@ -665,17 +675,50 @@ POLÍTICAS IMPORTANTES DE PUNTUALIDAD Y CANCELACIÓN:
       a.click();
     }
 
-    // --- ADMINISTRADOR ---
+    // --- ADMINISTRADOR (CON FILTROS DE ESTADO) ---
+    function setFilterStatus(statusType) {
+      currentAdminFilter = statusType;
+      
+      const btnAll = document.getElementById('btnFilterAll');
+      const btnToday = document.getElementById('btnFilterToday');
+      const btnConfirmed = document.getElementById('btnFilterConfirmed');
+      const btnPending = document.getElementById('btnFilterPending');
+
+      // Restablecer colores
+      btnAll.className = "px-3 py-1.5 bg-yellow-100 text-amber-950 font-bold text-xs rounded-lg border border-amber-300 transition-all";
+      btnToday.className = "px-3 py-1.5 bg-yellow-100 text-amber-950 font-bold text-xs rounded-lg border border-amber-300 transition-all";
+      btnConfirmed.className = "px-3 py-1.5 bg-yellow-100 text-amber-950 font-bold text-xs rounded-lg border border-amber-300 transition-all";
+      btnPending.className = "px-3 py-1.5 bg-yellow-100 text-amber-950 font-bold text-xs rounded-lg border border-amber-300 transition-all";
+
+      // Resaltar botón activo
+      if (statusType === 'all') btnAll.className = "px-3 py-1.5 bg-amber-500 text-amber-950 font-bold text-xs rounded-lg border border-amber-600 shadow-sm";
+      if (statusType === 'today') btnToday.className = "px-3 py-1.5 bg-amber-500 text-amber-950 font-bold text-xs rounded-lg border border-amber-600 shadow-sm";
+      if (statusType === 'confirmed') btnConfirmed.className = "px-3 py-1.5 bg-emerald-600 text-white font-bold text-xs rounded-lg border border-emerald-700 shadow-sm";
+      if (statusType === 'pending') btnPending.className = "px-3 py-1.5 bg-amber-600 text-white font-bold text-xs rounded-lg border border-amber-700 shadow-sm";
+
+      renderAdminAppointments();
+    }
+
     function renderAdminAppointments() {
       const container = document.getElementById('adminAppointmentsList');
       const search = document.getElementById('searchApp').value.toLowerCase();
-      const dateFilter = document.getElementById('filterDate').value;
+      const dateInputFilter = document.getElementById('filterDate').value;
       const todayStr = new Date().toISOString().split('T')[0];
 
       let filtered = appointments.filter(a => {
         const matchSearch = a.name.toLowerCase().includes(search) || a.phone.includes(search);
-        const matchDate = dateFilter ? a.date === dateFilter : true;
-        return matchSearch && matchDate;
+        const matchDate = dateInputFilter ? a.date === dateInputFilter : true;
+        
+        let matchStatus = true;
+        if (currentAdminFilter === 'today') {
+          matchStatus = a.date === todayStr;
+        } else if (currentAdminFilter === 'confirmed') {
+          matchStatus = a.paymentStatus === 'Anticipo' || a.paymentStatus === 'Pagado Completo' || a.deposit > 0;
+        } else if (currentAdminFilter === 'pending') {
+          matchStatus = a.paymentStatus === 'Pendiente' && (a.deposit === 0 || !a.deposit);
+        }
+
+        return matchSearch && matchDate && matchStatus;
       });
 
       filtered.sort((a, b) => (a.date + a.time).localeCompare(b.date + b.time));
@@ -683,7 +726,7 @@ POLÍTICAS IMPORTANTES DE PUNTUALIDAD Y CANCELACIÓN:
       if (filtered.length === 0) {
         container.innerHTML = `
           <div class="empty-state-bg p-8 rounded-2xl border-2 border-amber-300 shadow-md text-center">
-            <h3 class="text-base font-bold font-serif-title text-amber-950">No hay citas registradas en esta vista</h3>
+            <h3 class="text-base font-bold font-serif-title text-amber-950">No hay citas registradas con este filtro</h3>
           </div>
         `;
         return;
@@ -691,6 +734,7 @@ POLÍTICAS IMPORTANTES DE PUNTUALIDAD Y CANCELACIÓN:
 
       container.innerHTML = filtered.map(a => {
         const isToday = a.date === todayStr;
+        const isConfirmed = a.paymentStatus === 'Anticipo' || a.paymentStatus === 'Pagado Completo' || a.deposit > 0;
 
         return `
           <div class="bg-white/95 backdrop-blur-md p-5 rounded-2xl border ${isToday ? 'border-amber-500 ring-2 ring-amber-400' : 'border-amber-200'} shadow-md space-y-3">
@@ -699,6 +743,7 @@ POLÍTICAS IMPORTANTES DE PUNTUALIDAD Y CANCELACIÓN:
                 <div class="flex items-center space-x-2">
                   <h3 class="font-bold text-amber-950 text-base">🌻 ${a.name}</h3>
                   ${isToday ? '<span class="text-[10px] font-extrabold px-2 py-0.5 rounded-full bg-amber-500 text-amber-950">HOY</span>' : ''}
+                  ${isConfirmed ? '<span class="text-[10px] font-extrabold px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800 border border-emerald-300">CONFIRMADA</span>' : '<span class="text-[10px] font-extrabold px-2 py-0.5 rounded-full bg-amber-100 text-amber-800 border border-amber-300">PENDIENTE</span>'}
                 </div>
                 <p class="text-xs text-amber-800 font-medium">WhatsApp: ${a.phone}</p>
               </div>
@@ -711,7 +756,6 @@ POLÍTICAS IMPORTANTES DE PUNTUALIDAD Y CANCELACIÓN:
               </div>
             </div>
 
-            <!-- MODIFICACIÓN: EDITAR FECHA Y HORA DE CITA -->
             <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 text-xs">
               <div>
                 <span class="text-amber-700 block font-bold">Servicio</span>
@@ -763,7 +807,6 @@ POLÍTICAS IMPORTANTES DE PUNTUALIDAD Y CANCELACIÓN:
       lucide.createIcons();
     }
 
-    // EDICIÓN DE FECHA Y HORA DESDE ADMIN
     function updateAppointmentDate(id, newDate) {
       const app = appointments.find(a => a.id === id);
       if (app && newDate) {
@@ -789,6 +832,7 @@ POLÍTICAS IMPORTANTES DE PUNTUALIDAD Y CANCELACIÓN:
       if (app) {
         app.deposit = parseFloat(val) || 0;
         localStorage.setItem('spa_appointments', JSON.stringify(appointments));
+        renderAdminAppointments();
       }
     }
 
@@ -816,6 +860,7 @@ POLÍTICAS IMPORTANTES DE PUNTUALIDAD Y CANCELACIÓN:
       if (app) {
         app.paymentStatus = newStatus;
         localStorage.setItem('spa_appointments', JSON.stringify(appointments));
+        renderAdminAppointments();
       }
     }
 
@@ -826,12 +871,6 @@ POLÍTICAS IMPORTANTES DE PUNTUALIDAD Y CANCELACIÓN:
         renderAdminAppointments();
         checkAdminAlerts();
       }
-    }
-
-    function setFilterDate(type) {
-      const input = document.getElementById('filterDate');
-      input.value = (type === 'today') ? new Date().toISOString().split('T')[0] : '';
-      renderAdminAppointments();
     }
 
     // --- SERVICIOS ADMIN ---
