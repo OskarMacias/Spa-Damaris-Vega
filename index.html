@@ -33,6 +33,11 @@
                   url('https://images.unsplash.com/photo-1600334089648-b0d9d3028eb2?auto=format&fit=crop&w=800&q=80') center/cover no-repeat;
     }
 
+    /* REGLA FORZADA PARA OCULTAR EN MODO CLIENTE */
+    .admin-only-tab {
+      display: none !important;
+    }
+
     ::-webkit-scrollbar {
       width: 6px;
       height: 6px;
@@ -65,15 +70,15 @@
       </div>
 
       <div class="flex items-center space-x-3">
-        <!-- Indicador de Modo -->
+        <!-- Indicador de Estado -->
         <span id="roleBadge" class="hidden sm:inline-flex items-center px-3 py-1 rounded-full text-xs font-extrabold bg-amber-100 text-amber-900 border border-amber-300">
-          👤 Modo Cliente
+          👤 Cliente
         </span>
         
-        <!-- Botón de Acceso Admin -->
+        <!-- Botón Admin Simplificado -->
         <button id="btnAdminAuth" onclick="toggleAdminAuth()" class="px-3.5 py-1.5 bg-amber-950 hover:bg-amber-900 text-yellow-300 text-xs font-bold rounded-xl shadow-md transition-all flex items-center space-x-1.5 border border-amber-800">
           <i data-lucide="lock" class="w-3.5 h-3.5"></i>
-          <span id="btnAdminText">Acceso Admin</span>
+          <span id="btnAdminText">Admin</span>
         </button>
       </div>
 
@@ -115,7 +120,7 @@
 
     <!-- PESTAÑAS DE NAVEGACIÓN -->
     <div class="flex flex-wrap gap-2 border-b border-amber-300/70 pb-2">
-      <!-- Pestañas visibles para Clientes -->
+      <!-- Pestañas Visibles para Clientes -->
       <button onclick="switchTab('client-book')" id="tab-client-book" class="tab-btn px-4 py-2 rounded-xl text-xs sm:text-sm font-bold flex items-center space-x-2 transition-all bg-amber-500 text-amber-950 shadow-md border border-amber-600">
         <i data-lucide="calendar-plus" class="w-4 h-4"></i>
         <span>Agendar Cita</span>
@@ -126,18 +131,18 @@
         <span>Métodos de Pago</span>
       </button>
 
-      <!-- Pestañas Exclusivas de Administrador (Totalmente ocultas por defecto en Modo Cliente) -->
-      <button onclick="switchTab('admin-appointments')" id="tab-admin-appointments" class="hidden tab-btn px-4 py-2 rounded-xl text-xs sm:text-sm font-bold items-center space-x-2 transition-all text-amber-950 bg-yellow-100/80 hover:bg-amber-200 border border-amber-300">
+      <!-- Pestañas Exclusivas de Administrador (Ocultamiento Estricto por CSS en Modo Cliente) -->
+      <button onclick="switchTab('admin-appointments')" id="tab-admin-appointments" class="admin-only-tab tab-btn px-4 py-2 rounded-xl text-xs sm:text-sm font-bold flex items-center space-x-2 transition-all text-amber-950 bg-yellow-100/80 hover:bg-amber-200 border border-amber-300">
         <i data-lucide="clipboard-list" class="w-4 h-4 text-amber-800"></i>
-        <span>📋 Panel de Citas (Admin)</span>
+        <span>📋 Panel de Citas</span>
       </button>
 
-      <button onclick="switchTab('admin-services')" id="tab-admin-services" class="hidden tab-btn px-4 py-2 rounded-xl text-xs sm:text-sm font-bold items-center space-x-2 transition-all text-amber-950 bg-yellow-100/80 hover:bg-amber-200 border border-amber-300">
+      <button onclick="switchTab('admin-services')" id="tab-admin-services" class="admin-only-tab tab-btn px-4 py-2 rounded-xl text-xs sm:text-sm font-bold flex items-center space-x-2 transition-all text-amber-950 bg-yellow-100/80 hover:bg-amber-200 border border-amber-300">
         <i data-lucide="settings" class="w-4 h-4 text-amber-800"></i>
         <span>⚙️ Gestión de Servicios</span>
       </button>
 
-      <button onclick="switchTab('admin-payment-config')" id="tab-admin-payment-config" class="hidden tab-btn px-4 py-2 rounded-xl text-xs sm:text-sm font-bold items-center space-x-2 transition-all text-amber-950 bg-yellow-100/80 hover:bg-amber-200 border border-amber-300">
+      <button onclick="switchTab('admin-payment-config')" id="tab-admin-payment-config" class="admin-only-tab tab-btn px-4 py-2 rounded-xl text-xs sm:text-sm font-bold flex items-center space-x-2 transition-all text-amber-950 bg-yellow-100/80 hover:bg-amber-200 border border-amber-300">
         <i data-lucide="wallet" class="w-4 h-4 text-amber-800"></i>
         <span>💳 Configurar Cuentas</span>
       </button>
@@ -147,7 +152,6 @@
     <section id="sec-client-book" class="space-y-6">
       <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
 
-        <!-- FORMULARIO DE AGENDAMIENTO CLIENTE -->
         <div class="lg:col-span-6 bg-yellow-50/95 backdrop-blur-md p-6 rounded-2xl border border-amber-300 shadow-xl space-y-4">
           <div class="flex items-center justify-between border-b border-amber-200 pb-3">
             <div class="flex items-center space-x-2">
@@ -171,7 +175,6 @@
             <div>
               <label class="block text-xs font-bold text-amber-900 mb-1">Selecciona tu Servicio o Masaje *</label>
               <select id="clientService" required onchange="updateServiceInfo()" class="w-full px-3.5 py-2 rounded-xl border border-amber-300 text-sm focus:outline-none focus:ring-2 focus:ring-amber-500 bg-white/90 font-medium text-amber-950">
-                <!-- Dinámico -->
               </select>
             </div>
 
@@ -208,14 +211,12 @@
           </form>
         </div>
 
-        <!-- TARJETA INFORMATIVA / CATÁLOGO VISIBLE CLIENTE -->
         <div class="lg:col-span-6 space-y-4">
           <div class="bg-yellow-50/95 backdrop-blur-md p-6 rounded-2xl border border-amber-300 shadow-xl space-y-4">
             <h3 class="text-lg font-bold font-serif-title text-amber-950 border-b border-amber-200 pb-2 flex items-center gap-2">
               <span>💆‍♀️</span> Nuestros Servicios Destacados
             </h3>
             <div id="clientCatalogList" class="space-y-3 max-h-[480px] overflow-y-auto pr-1">
-              <!-- Renderizado dinámico de servicios para clientes -->
             </div>
           </div>
         </div>
@@ -223,7 +224,7 @@
       </div>
     </section>
 
-    <!-- VISTA 2: CLIENTE - MÉTODOS DE PAGO (DINÁMICO) -->
+    <!-- VISTA 2: CLIENTE - MÉTODOS DE PAGO -->
     <section id="sec-client-payments" class="hidden space-y-6">
       <div class="max-w-3xl mx-auto bg-yellow-50/95 backdrop-blur-md p-6 rounded-2xl border border-amber-300 shadow-xl space-y-6">
         <div class="text-center space-y-2 border-b border-amber-200 pb-4">
@@ -235,13 +236,13 @@
         </div>
 
         <div id="paymentAccountsClientList" class="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <!-- Renderizado dinámico de las cuentas configuradas -->
         </div>
 
         <div class="bg-amber-100/90 p-4 rounded-xl border border-amber-300 text-xs text-amber-950 space-y-2">
           <p class="font-bold flex items-center gap-1"><span>📲</span> Envío de Comprobante:</p>
           <p>Una vez realizado tu anticipo, por favor presiona el botón de abajo para enviar la captura del comprobante por WhatsApp y confirmar tu lugar.</p>
-          <a href="https://wa.me/526671234567?text=Hola,%20adjunto%20mi%20comprobante%20de%20pago%20para%20confirmar%20mi%20cita%20en%20el%20Spa." target="_blank" class="inline-flex items-center space-x-2 bg-emerald-600 hover:bg-emerald-700 text-white font-bold px-4 py-2 rounded-xl text-xs shadow-md transition-colors">
+          <!-- Enlace directo al WhatsApp oficial 6674992354 -->
+          <a href="https://wa.me/526674992354?text=Hola,%20adjunto%20mi%20comprobante%20de%20pago%20para%20confirmar%20mi%20cita%20en%20el%20Spa." target="_blank" class="inline-flex items-center space-x-2 bg-emerald-600 hover:bg-emerald-700 text-white font-bold px-4 py-2 rounded-xl text-xs shadow-md transition-colors">
             <i data-lucide="message-circle" class="w-4 h-4"></i>
             <span>Enviar Comprobante por WhatsApp</span>
           </a>
@@ -249,7 +250,7 @@
       </div>
     </section>
 
-    <!-- VISTA 3: ADMIN - PANEL DE CITAS (SÓLO ADMIN) -->
+    <!-- VISTA 3: ADMIN - PANEL DE CITAS -->
     <section id="sec-admin-appointments" class="hidden space-y-6">
       <div class="bg-yellow-50/95 backdrop-blur-md p-4 rounded-2xl border border-amber-300 shadow-lg flex flex-col sm:flex-row items-center justify-between gap-3">
         <div class="relative flex-1 w-full">
@@ -269,15 +270,13 @@
       </div>
 
       <div id="adminAppointmentsList" class="space-y-3">
-        <!-- Renderizado dinámico citas admin -->
       </div>
     </section>
 
-    <!-- VISTA 4: ADMIN - GESTIÓN DE SERVICIOS (SÓLO ADMIN) -->
+    <!-- VISTA 4: ADMIN - GESTIÓN DE SERVICIOS -->
     <section id="sec-admin-services" class="hidden space-y-6">
       <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
 
-        <!-- Formulario Servicio -->
         <div class="lg:col-span-4 bg-yellow-50/95 backdrop-blur-md p-6 rounded-2xl border border-amber-300 shadow-xl space-y-4">
           <div class="flex items-center space-x-2 border-b border-amber-200 pb-3">
             <i data-lucide="plus-circle" class="w-5 h-5 text-amber-700"></i>
@@ -313,7 +312,6 @@
           </form>
         </div>
 
-        <!-- Lista de Servicios Admin -->
         <div class="lg:col-span-8">
           <div class="bg-yellow-50/95 backdrop-blur-md p-6 rounded-2xl border border-amber-300 shadow-xl space-y-4">
             <div class="flex justify-between items-center border-b border-amber-200 pb-3">
@@ -322,7 +320,6 @@
             </div>
             
             <div id="adminServicesList" class="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <!-- Dinámico -->
             </div>
           </div>
         </div>
@@ -330,11 +327,10 @@
       </div>
     </section>
 
-    <!-- VISTA 5: ADMIN - CONFIGURACIÓN DE CUENTAS DE PAGO (SÓLO ADMIN) -->
+    <!-- VISTA 5: ADMIN - CONFIGURACIÓN DE CUENTAS DE PAGO -->
     <section id="sec-admin-payment-config" class="hidden space-y-6">
       <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
 
-        <!-- Formulario Cuentas -->
         <div class="lg:col-span-4 bg-yellow-50/95 backdrop-blur-md p-6 rounded-2xl border border-amber-300 shadow-xl space-y-4">
           <div class="flex items-center space-x-2 border-b border-amber-200 pb-3">
             <i data-lucide="plus-circle" class="w-5 h-5 text-amber-700"></i>
@@ -344,7 +340,7 @@
           <form onsubmit="savePaymentAccount(event)" class="space-y-4">
             <div>
               <label class="block text-xs font-bold text-amber-900 mb-1">Nombre de la Institución o Método *</label>
-              <input type="text" id="accBank" required placeholder="Ej. BBVA Bancomer / Depósito OXXO" class="w-full px-3.5 py-2 rounded-xl border border-amber-300 text-sm focus:outline-none focus:ring-2 focus:ring-amber-500 bg-white/90">
+              <input type="text" id="accBank" required placeholder="Ej. BBVA BANCOMER / DEPÓSITO EN OXXO" class="w-full px-3.5 py-2 rounded-xl border border-amber-300 text-sm focus:outline-none focus:ring-2 focus:ring-amber-500 bg-white/90">
             </div>
 
             <div>
@@ -359,7 +355,7 @@
 
             <div>
               <label class="block text-xs font-bold text-amber-900 mb-1">Instrucciones o Notas adicionales</label>
-              <textarea id="accNotes" rows="2" placeholder="Ej. Enviar foto del recibo de OXXO por WhatsApp..." class="w-full px-3.5 py-2 rounded-xl border border-amber-300 text-sm focus:outline-none focus:ring-2 focus:ring-amber-500 bg-white/90"></textarea>
+              <textarea id="accNotes" rows="2" placeholder="Ej. Enviar foto del recibo por WhatsApp al 6674992354..." class="w-full px-3.5 py-2 rounded-xl border border-amber-300 text-sm focus:outline-none focus:ring-2 focus:ring-amber-500 bg-white/90"></textarea>
             </div>
 
             <button type="submit" class="w-full bg-amber-500 hover:bg-amber-600 text-amber-950 font-bold py-2.5 rounded-xl text-sm transition-all shadow-md flex items-center justify-center space-x-2 border border-amber-600">
@@ -369,7 +365,6 @@
           </form>
         </div>
 
-        <!-- Lista Cuentas Configuradas -->
         <div class="lg:col-span-8">
           <div class="bg-yellow-50/95 backdrop-blur-md p-6 rounded-2xl border border-amber-300 shadow-xl space-y-4">
             <div class="flex justify-between items-center border-b border-amber-200 pb-3">
@@ -378,7 +373,6 @@
             </div>
             
             <div id="adminAccountsList" class="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <!-- Dinámico -->
             </div>
           </div>
         </div>
@@ -426,29 +420,27 @@
 
     // --- MODO ADMIN AUTH ---
     function toggleAdminAuth() {
+      const adminTabs = document.querySelectorAll('.admin-only-tab');
+
       if (isAdminLoggedIn) {
         isAdminLoggedIn = false;
-        document.getElementById('roleBadge').innerText = "👤 Modo Cliente";
-        document.getElementById('btnAdminText').innerText = "Acceso Admin";
+        document.getElementById('roleBadge').innerText = "👤 Cliente";
+        document.getElementById('btnAdminText').innerText = "Admin";
         
-        // Ocultar pestañas de administración
-        document.getElementById('tab-admin-appointments').classList.replace('flex', 'hidden');
-        document.getElementById('tab-admin-services').classList.replace('flex', 'hidden');
-        document.getElementById('tab-admin-payment-config').classList.replace('flex', 'hidden');
+        // Ocultar pestañas privadas aplicando la clase estrictamente
+        adminTabs.forEach(tab => tab.classList.add('admin-only-tab'));
         document.getElementById('alertBannerAdmin').classList.add('hidden');
 
         switchTab('client-book');
       } else {
         const pass = prompt('Ingresa la contraseña de Administrador:');
-        if (pass === '1234') { // Contraseña por defecto: 1234
+        if (pass === '1234') { // Contraseña por defecto 1234
           isAdminLoggedIn = true;
-          document.getElementById('roleBadge').innerText = "🔑 Administrador";
-          document.getElementById('btnAdminText').innerText = "Cerrar Sesión Admin";
+          document.getElementById('roleBadge').innerText = "🔑 Admin";
+          document.getElementById('btnAdminText').innerText = "Salir Admin";
           
-          // Mostrar pestañas de administración
-          document.getElementById('tab-admin-appointments').classList.replace('hidden', 'flex');
-          document.getElementById('tab-admin-services').classList.replace('hidden', 'flex');
-          document.getElementById('tab-admin-payment-config').classList.replace('hidden', 'flex');
+          // Mostrar pestañas privadas quitando la clase estricta
+          adminTabs.forEach(tab => tab.classList.remove('admin-only-tab'));
 
           checkAdminAlerts();
           switchTab('admin-appointments');
@@ -465,13 +457,13 @@
         const sec = document.getElementById(`sec-${t}`);
         const btn = document.getElementById(`tab-${t}`);
         if (sec) sec.classList.add('hidden');
-        if (btn) btn.className = "tab-btn px-4 py-2 rounded-xl text-xs sm:text-sm font-bold flex items-center space-x-2 transition-all text-amber-950 bg-yellow-100/80 hover:bg-amber-200 border border-amber-300";
+        if (btn) btn.className = btn.className.replace('bg-amber-500 text-amber-950 shadow-md border-amber-600', 'bg-yellow-100/80 text-amber-950 border-amber-300');
       });
 
       const activeSec = document.getElementById(`sec-${tabId}`);
       const activeBtn = document.getElementById(`tab-${tabId}`);
       if (activeSec) activeSec.classList.remove('hidden');
-      if (activeBtn) activeBtn.className = "tab-btn px-4 py-2 rounded-xl text-xs sm:text-sm font-bold flex items-center space-x-2 transition-all bg-amber-500 text-amber-950 shadow-md border border-amber-600";
+      if (activeBtn) activeBtn.className = activeBtn.className.replace('bg-yellow-100/80 text-amber-950 border-amber-300', 'bg-amber-500 text-amber-950 shadow-md border-amber-600');
     }
 
     // --- FUNCIONAMIENTO CLIENTE ---
@@ -580,12 +572,12 @@
       appointments.push(newApp);
       localStorage.setItem('spa_appointments', JSON.stringify(appointments));
 
-      const cleanPhone = phone.replace(/\D/g, '');
       const parts = date.split('-');
       const formattedDate = `${parts[2]}/${parts[1]}/${parts[0]}`;
 
       const text = `Hola, mi nombre es *${name}*. Quisiera agendar una cita para el servicio: *${serviceObj.name}* para el día *${formattedDate}* a las *${time} hs*. Quedo a la espera de confirmar la disponibilidad y enviar mi comprobante de anticipo. ✨🌻`;
-      const waUrl = `https://wa.me/526671234567?text=${encodeURIComponent(text)}`;
+      // Número oficial 6674992354
+      const waUrl = `https://wa.me/526674992354?text=${encodeURIComponent(text)}`;
 
       alert('¡Cita solicitada! Serás redirigido a WhatsApp para confirmar tu asistencia.');
       window.open(waUrl, '_blank');
