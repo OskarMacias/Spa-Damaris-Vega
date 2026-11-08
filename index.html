@@ -1,3 +1,4 @@
+```html
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -23,19 +24,25 @@
       font-family: 'Playfair Display', serif;
     }
 
-    /* Fondo principal del encabezado */
     .spa-hero-bg {
       background: linear-gradient(to right, rgba(254, 240, 138, 0.88), rgba(253, 230, 138, 0.85)), 
                   url('https://images.unsplash.com/photo-1544161515-4ab6ce6db874?auto=format&fit=crop&w=1600&q=80') center/cover no-repeat;
     }
 
-    /* Tarjeta de estado vacío con imagen relajante */
     .empty-state-bg {
-      background: linear-gradient(to bottom, rgba(255, 255, 255, 0.88), rgba(254, 243, 199, 0.92)),
+      background: linear-gradient(to bottom, rgba(255, 255, 255, 0.92), rgba(254, 243, 199, 0.95)),
                   url('https://images.unsplash.com/photo-1600334089648-b0d9d3028eb2?auto=format&fit=crop&w=800&q=80') center/cover no-repeat;
     }
 
-    /* Scrollbar con estilo girasol */
+    @keyframes pulse-ring {
+      0% { transform: scale(0.95); opacity: 0.8; }
+      50% { transform: scale(1.05); opacity: 1; }
+      100% { transform: scale(0.95); opacity: 0.8; }
+    }
+    .animate-ring {
+      animation: pulse-ring 1.8s infinite ease-in-out;
+    }
+
     ::-webkit-scrollbar {
       width: 6px;
       height: 6px;
@@ -47,20 +54,16 @@
       background: #EAB308;
       border-radius: 4px;
     }
-    ::-webkit-scrollbar-thumb:hover {
-      background: #CA8A04;
-    }
   </style>
 </head>
 <body class="min-h-screen flex flex-col antialiased selection:bg-amber-200 selection:text-amber-950">
 
-  <!-- TOP HEADER CON ESTILO GIRASOL Y SPA -->
+  <!-- TOP HEADER -->
   <header class="bg-amber-400 text-stone-900 border-b-2 border-amber-500 shadow-lg sticky top-0 z-30">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between">
       
       <div class="flex items-center space-x-3">
-        <!-- Icono Girasol -->
-        <div class="w-12 h-12 rounded-full bg-yellow-300 border-2 border-amber-600 flex items-center justify-center text-amber-900 shadow-md p-1.5">
+        <div class="w-11 h-11 rounded-full bg-yellow-300 border-2 border-amber-600 flex items-center justify-center text-amber-900 shadow-md p-1.5">
           <i data-lucide="sun" class="w-7 h-7 text-amber-700 animate-spin-slow"></i>
         </div>
         <div>
@@ -68,53 +71,53 @@
             Spa de Damaris Vega
             <span class="text-lg">🌻</span>
           </h1>
-          <p class="text-[11px] font-semibold tracking-wider uppercase text-amber-900">Salud • Masajes • Relajación & Estética</p>
+          <p class="text-[10px] sm:text-xs font-semibold tracking-wider uppercase text-amber-900">Salud • Masajes • Relajación & Estética</p>
         </div>
       </div>
 
-      <div class="flex items-center space-x-3">
-        <!-- Fecha actual -->
-        <div class="hidden md:flex items-center space-x-2 text-xs font-bold text-amber-950 bg-yellow-200/90 px-3.5 py-1.5 rounded-full border border-amber-400">
-          <i data-lucide="calendar" class="w-4 h-4 text-amber-800"></i>
-          <span id="currentDateDisplay">--/--/----</span>
+      <div class="flex items-center space-x-2 sm:space-x-3">
+        <!-- Indicador de Modo -->
+        <div id="modeBadge" class="hidden sm:flex items-center space-x-1.5 px-3 py-1 rounded-full text-xs font-bold bg-amber-100 text-amber-950 border border-amber-400">
+          <i data-lucide="user" class="w-3.5 h-3.5"></i>
+          <span id="modeBadgeText">Vista Cliente</span>
         </div>
-        
-        <!-- Insignia Alerta de Hoy -->
-        <div id="todayAlertBadge" class="flex items-center space-x-2 px-3.5 py-1.5 rounded-full text-xs font-bold bg-amber-100 text-amber-950 border border-amber-400 shadow-sm transition-all">
-          <span class="w-2.5 h-2.5 rounded-full bg-amber-600 animate-ping"></span>
-          <span id="todayAlertCount">Cargando citas...</span>
-        </div>
+
+        <!-- Botón Toggle Admin -->
+        <button id="btnAdminAccess" onclick="toggleAdminModal()" class="px-3.5 py-1.5 rounded-full text-xs font-extrabold bg-amber-950 text-yellow-300 hover:bg-amber-900 border border-amber-700 shadow-md flex items-center space-x-1.5 transition-all">
+          <i data-lucide="lock" class="w-3.5 h-3.5"></i>
+          <span id="btnAdminText">Acceso Admin</span>
+        </button>
       </div>
 
     </div>
   </header>
 
-  <!-- BANNER ENCABEZADO CON IMAGEN DE FONDO RELAJANTE -->
-  <div class="spa-hero-bg border-b border-amber-300 py-8 px-4 text-center shadow-inner">
+  <!-- BANNER ENCABEZADO -->
+  <div class="spa-hero-bg border-b border-amber-300 py-6 px-4 text-center shadow-inner">
     <div class="max-w-3xl mx-auto space-y-2">
       <div class="inline-flex items-center space-x-2 bg-yellow-400/90 text-amber-950 px-3 py-1 rounded-full text-xs font-bold border border-yellow-500 shadow-sm">
         <span>🌻 Centro Holístico & Spa</span>
       </div>
-      <h2 class="text-3xl md:text-4xl font-serif-title font-bold text-amber-950 drop-shadow-sm">Espacio de Relajación & Armonía</h2>
-      <p class="text-xs md:text-sm font-semibold text-amber-950">Gestiona las citas de masajes, corporales y faciales con un ambiente cálido y radiante.</p>
+      <h2 class="text-2xl md:text-3xl font-serif-title font-bold text-amber-950 drop-shadow-sm">Reserva tu Cita de Bienestar</h2>
+      <p class="text-xs md:text-sm font-semibold text-amber-950">Agenda fácilmente tu masaje o facial en línea. Selecciona tu fecha y horario preferido.</p>
     </div>
   </div>
 
-  <!-- ALERTA AUTOMÁTICA DE CITAS PARA LA COMPUTADORA -->
-  <div id="alertBanner" class="bg-gradient-to-r from-amber-500 via-yellow-500 to-amber-600 text-amber-950 shadow-md">
+  <!-- ALERTA DE NUEVAS CITAS (SOLO ADMIN) -->
+  <div id="adminAlertBanner" class="hidden bg-gradient-to-r from-amber-500 via-yellow-500 to-amber-600 text-amber-950 shadow-md">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3 flex flex-col md:flex-row items-center justify-between gap-3">
       <div class="flex items-center space-x-3">
-        <div class="p-2 bg-yellow-200/70 rounded-lg">
-          <i data-lucide="bell-ring" class="w-6 h-6 text-amber-950 animate-bounce"></i>
+        <div class="p-2 bg-yellow-200/80 rounded-lg animate-ring">
+          <i data-lucide="bell-ring" class="w-6 h-6 text-amber-950"></i>
         </div>
         <div>
-          <p class="text-xs uppercase tracking-wider text-amber-950 font-extrabold">¡Recordatorios de Citas de Hoy! 🌻</p>
-          <p id="alertBannerText" class="text-sm font-medium">Hay clientes agendados para hoy. Envíales su mensaje por WhatsApp.</p>
+          <p class="text-xs uppercase tracking-wider text-amber-950 font-extrabold">¡Panel Administrador Activo! 🌻</p>
+          <p id="alertBannerText" class="text-sm font-medium">Monitorea citas del día y envía los mensajes de seguimiento para confirmar asistencia.</p>
         </div>
       </div>
       <div class="flex items-center space-x-2 w-full md:w-auto">
         <button onclick="scrollToTodayAppointments()" class="flex-1 md:flex-initial px-4 py-1.5 bg-amber-950 text-yellow-300 hover:bg-amber-900 text-xs font-bold rounded-lg transition-colors shadow-sm flex items-center justify-center space-x-1">
-          <span>Ver Citas del Día</span>
+          <span>Ver Citas de Hoy</span>
           <i data-lucide="arrow-down" class="w-3.5 h-3.5"></i>
         </button>
       </div>
@@ -124,139 +127,243 @@
   <!-- CONTENEDOR PRINCIPAL -->
   <main class="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-6">
 
-    <!-- PESTAÑAS DE NAVEGACIÓN -->
+    <!-- BARRA NAVEGACIÓN DE PESTAÑAS -->
     <div class="flex flex-wrap gap-2 border-b border-amber-300/70 pb-2">
-      <button onclick="switchTab('appointments')" id="tab-appointments" class="tab-btn px-5 py-2.5 rounded-xl text-sm font-bold flex items-center space-x-2 transition-all bg-amber-500 text-amber-950 shadow-md border border-amber-600">
-        <i data-lucide="calendar" class="w-4 h-4"></i>
-        <span>Agendar y Citas</span>
+      <button onclick="switchTab('booking')" id="tab-booking" class="tab-btn px-5 py-2.5 rounded-xl text-sm font-bold flex items-center space-x-2 transition-all bg-amber-500 text-amber-950 shadow-md border border-amber-600">
+        <i data-lucide="calendar-plus" class="w-4 h-4"></i>
+        <span>Agendar Cita</span>
       </button>
-      <button onclick="switchTab('services')" id="tab-services" class="tab-btn px-5 py-2.5 rounded-xl text-sm font-bold flex items-center space-x-2 transition-all text-amber-950 bg-yellow-100/70 hover:bg-amber-200 border border-amber-300">
+
+      <!-- Pestañas visibles según rol -->
+      <button onclick="switchTab('payments')" id="tab-payments" class="tab-btn px-5 py-2.5 rounded-xl text-sm font-bold flex items-center space-x-2 transition-all text-amber-950 bg-yellow-100/70 hover:bg-amber-200 border border-amber-300">
+        <i data-lucide="qr-code" class="w-4 h-4"></i>
+        <span>Métodos de Pago</span>
+      </button>
+
+      <button onclick="switchTab('admin-schedule')" id="tab-admin-schedule" class="hidden tab-btn px-5 py-2.5 rounded-xl text-sm font-bold flex items-center space-x-2 transition-all text-amber-950 bg-yellow-100/70 hover:bg-amber-200 border border-amber-300">
+        <i data-lucide="clipboard-list" class="w-4 h-4"></i>
+        <span>Panel de Citas (Admin)</span>
+      </button>
+
+      <button onclick="switchTab('admin-services')" id="tab-admin-services" class="hidden tab-btn px-5 py-2.5 rounded-xl text-sm font-bold flex items-center space-x-2 transition-all text-amber-950 bg-yellow-100/70 hover:bg-amber-200 border border-amber-300">
         <i data-lucide="sparkles" class="w-4 h-4"></i>
-        <span>Catálogo de Masajes & Servicios</span>
+        <span>Gestión de Servicios</span>
       </button>
     </div>
 
-    <!-- SECCIÓN: AGENDAR Y CITAS -->
-    <section id="sec-appointments" class="space-y-6">
+    <!-- PESTAÑA 1: AGENDAR CITA (CLIENTE / PUBLICO) -->
+    <section id="sec-booking" class="space-y-6">
       <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
 
-        <!-- FORMULARIO DE NUEVA CITA -->
-        <div class="lg:col-span-4 bg-yellow-50/95 backdrop-blur-md p-6 rounded-2xl border border-amber-300 shadow-xl space-y-4">
+        <!-- Formulario público de Reserva -->
+        <div class="lg:col-span-6 bg-yellow-50/95 backdrop-blur-md p-6 rounded-2xl border border-amber-300 shadow-xl space-y-4">
           <div class="flex items-center justify-between border-b border-amber-200 pb-3">
             <div class="flex items-center space-x-2">
-              <i data-lucide="user-plus" class="w-5 h-5 text-amber-700"></i>
-              <h2 class="text-lg font-bold font-serif-title text-amber-950">Agendar Cita</h2>
+              <i data-lucide="heart" class="w-5 h-5 text-amber-700"></i>
+              <h2 class="text-lg font-bold font-serif-title text-amber-950">Ingresa tus datos para agendar</h2>
             </div>
             <span class="text-xl">🌻</span>
           </div>
 
-          <form id="appointmentForm" onsubmit="saveAppointment(event)" class="space-y-4">
-            <input type="hidden" id="appId">
-
+          <form id="publicBookingForm" onsubmit="handlePublicBooking(event)" class="space-y-4">
             <div>
-              <label class="block text-xs font-bold text-amber-900 mb-1">Nombre Completo del Cliente *</label>
-              <input type="text" id="clientName" required placeholder="Ej. Ana Patricia Gómez" class="w-full px-3.5 py-2 rounded-xl border border-amber-300 text-sm focus:outline-none focus:ring-2 focus:ring-amber-500 bg-white/90">
+              <label class="block text-xs font-bold text-amber-900 mb-1">Nombre Completo *</label>
+              <input type="text" id="custName" required placeholder="Ej. Ana Patricia Gómez" class="w-full px-3.5 py-2 rounded-xl border border-amber-300 text-sm focus:outline-none focus:ring-2 focus:ring-amber-500 bg-white/90">
             </div>
 
             <div>
               <label class="block text-xs font-bold text-amber-900 mb-1">Teléfono WhatsApp (10 dígitos) *</label>
-              <input type="tel" id="clientPhone" required placeholder="Ej. 6671234567" pattern="[0-9]{10}" class="w-full px-3.5 py-2 rounded-xl border border-amber-300 text-sm focus:outline-none focus:ring-2 focus:ring-amber-500 bg-white/90">
+              <input type="tel" id="custPhone" required placeholder="Ej. 6671234567" pattern="[0-9]{10}" class="w-full px-3.5 py-2 rounded-xl border border-amber-300 text-sm focus:outline-none focus:ring-2 focus:ring-amber-500 bg-white/90">
             </div>
 
             <div>
               <label class="block text-xs font-bold text-amber-900 mb-1">Servicio de Spa *</label>
-              <select id="appService" required class="w-full px-3.5 py-2 rounded-xl border border-amber-300 text-sm focus:outline-none focus:ring-2 focus:ring-amber-500 bg-white/90">
-                <!-- Se llena dinámicamente -->
+              <select id="custService" required onchange="updateServiceInfo()" class="w-full px-3.5 py-2 rounded-xl border border-amber-300 text-sm focus:outline-none focus:ring-2 focus:ring-amber-500 bg-white/90">
+                <!-- Inyectado vía JS -->
               </select>
             </div>
 
-            <div class="grid grid-cols-2 gap-3">
-              <div>
-                <label class="block text-xs font-bold text-amber-900 mb-1">Fecha *</label>
-                <input type="date" id="appDate" required class="w-full px-3.5 py-2 rounded-xl border border-amber-300 text-sm focus:outline-none focus:ring-2 focus:ring-amber-500 bg-white/90">
-              </div>
-              <div>
-                <label class="block text-xs font-bold text-amber-900 mb-1">Hora *</label>
-                <input type="time" id="appTime" required class="w-full px-3.5 py-2 rounded-xl border border-amber-300 text-sm focus:outline-none focus:ring-2 focus:ring-amber-500 bg-white/90">
-              </div>
+            <!-- Información del servicio seleccionado -->
+            <div id="serviceDetailBox" class="hidden p-3 rounded-xl bg-amber-100/80 border border-amber-300 text-xs text-amber-950 space-y-1">
+              <p class="font-bold flex justify-between">
+                <span id="boxServiceName">-</span>
+                <span id="boxServicePrice" class="text-amber-900 font-extrabold">$0.00</span>
+              </p>
+              <p id="boxServiceDesc" class="text-stone-700 italic">--</p>
             </div>
 
-            <div class="grid grid-cols-2 gap-3">
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
               <div>
-                <label class="block text-xs font-bold text-amber-900 mb-1">Pago / Anticipo ($) *</label>
-                <input type="number" id="appDeposit" min="0" step="0.01" required placeholder="0.00" class="w-full px-3.5 py-2 rounded-xl border border-amber-300 text-sm focus:outline-none focus:ring-2 focus:ring-amber-500 bg-white/90">
+                <label class="block text-xs font-bold text-amber-900 mb-1">Selecciona Fecha *</label>
+                <input type="date" id="custDate" required onchange="updateAvailableHours()" class="w-full px-3.5 py-2 rounded-xl border border-amber-300 text-sm focus:outline-none focus:ring-2 focus:ring-amber-500 bg-white/90">
               </div>
               <div>
-                <label class="block text-xs font-bold text-amber-900 mb-1">Estado de Pago</label>
-                <select id="appPaymentStatus" class="w-full px-3.5 py-2 rounded-xl border border-amber-300 text-sm focus:outline-none focus:ring-2 focus:ring-amber-500 bg-white/90">
-                  <option value="Anticipo">Anticipo</option>
-                  <option value="Pagado Completo">Pagado Completo</option>
-                  <option value="Pendiente">Pendiente</option>
+                <label class="block text-xs font-bold text-amber-900 mb-1">Horario Disponible *</label>
+                <select id="custTime" required class="w-full px-3.5 py-2 rounded-xl border border-amber-300 text-sm focus:outline-none focus:ring-2 focus:ring-amber-500 bg-white/90">
+                  <option value="">Selecciona fecha primero...</option>
                 </select>
               </div>
             </div>
 
             <div>
-              <label class="block text-xs font-bold text-amber-900 mb-1">Notas o preferencia</label>
-              <textarea id="appNotes" rows="2" placeholder="Ej. Alergia a aceites de almendra, prefiere presión media..." class="w-full px-3.5 py-2 rounded-xl border border-amber-300 text-sm focus:outline-none focus:ring-2 focus:ring-amber-500 bg-white/90"></textarea>
+              <label class="block text-xs font-bold text-amber-900 mb-1">Comentario o notas especiales (opcional)</label>
+              <textarea id="custNotes" rows="2" placeholder="Ej. Sensibilidad en la piel, preferencia por masajista..." class="w-full px-3.5 py-2 rounded-xl border border-amber-300 text-sm focus:outline-none focus:ring-2 focus:ring-amber-500 bg-white/90"></textarea>
             </div>
 
-            <div class="pt-2 flex space-x-2">
-              <button type="submit" id="btnSubmitApp" class="flex-1 bg-amber-500 hover:bg-amber-600 text-amber-950 font-bold py-2.5 rounded-xl text-sm transition-all shadow-md flex items-center justify-center space-x-2 border border-amber-600">
-                <i data-lucide="check-circle" class="w-4 h-4"></i>
-                <span>Agendar Cita</span>
-              </button>
-              <button type="button" onclick="resetAppForm()" class="px-3.5 py-2.5 bg-yellow-200 hover:bg-yellow-300 text-amber-900 rounded-xl text-sm font-bold transition-all">
-                Limpiar
-              </button>
+            <div class="p-3 bg-yellow-100/90 rounded-xl border border-amber-300 text-xs text-amber-950 space-y-1">
+              <p class="font-bold flex items-center gap-1">
+                <i data-lucide="info" class="w-4 h-4 text-amber-700"></i>
+                Anticipo requerido para confirmar:
+              </p>
+              <p class="text-stone-700">Al dar clic en solicitar cita, generarás tu folio y podrás transferir tu anticipo para apartar tu lugar.</p>
             </div>
+
+            <button type="submit" class="w-full bg-amber-500 hover:bg-amber-600 text-amber-950 font-extrabold py-3 rounded-xl text-sm transition-all shadow-md flex items-center justify-center space-x-2 border border-amber-600">
+              <i data-lucide="calendar-check" class="w-4 h-4"></i>
+              <span>Solicitar y Confirmar por WhatsApp</span>
+            </button>
           </form>
         </div>
 
-        <!-- FILTROS Y TARJETAS DE CITAS -->
-        <div class="lg:col-span-8 space-y-4">
-          
-          <div class="bg-yellow-50/95 backdrop-blur-md p-4 rounded-2xl border border-amber-300 shadow-lg flex flex-col sm:flex-row items-center justify-between gap-3">
-            <div class="relative flex-1 w-full">
-              <i data-lucide="search" class="w-4 h-4 text-amber-600 absolute left-3 top-1/2 transform -translate-y-1/2"></i>
-              <input type="text" id="searchApp" oninput="renderAppointments()" placeholder="Buscar cliente o teléfono..." class="w-full pl-9 pr-3 py-2 bg-white/90 border border-amber-300 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-amber-500">
+        <!-- Tarjeta Informativa / Métodos de pago rápido -->
+        <div class="lg:col-span-6 space-y-4">
+          <div class="bg-yellow-50/95 backdrop-blur-md p-6 rounded-2xl border border-amber-300 shadow-xl space-y-4">
+            <div class="flex items-center space-x-2 border-b border-amber-200 pb-3">
+              <i data-lucide="sparkles" class="w-5 h-5 text-amber-700"></i>
+              <h3 class="text-lg font-bold font-serif-title text-amber-950">¿Cómo agendar tu cita?</h3>
             </div>
+            
+            <ol class="space-y-3 text-xs text-amber-950 font-medium">
+              <li class="flex items-start space-x-2.5">
+                <span class="w-5 h-5 rounded-full bg-amber-400 text-amber-950 font-bold flex items-center justify-center text-xs shrink-0">1</span>
+                <span>Ingresa tu nombre, teléfono de WhatsApp y el masaje o facial que deseas.</span>
+              </li>
+              <li class="flex items-start space-x-2.5">
+                <span class="w-5 h-5 rounded-full bg-amber-400 text-amber-950 font-bold flex items-center justify-center text-xs shrink-0">2</span>
+                <span>Elige la fecha deseada; el sistema únicamente te mostrará las <b>horas disponibles</b> sin encimarse con otras personas.</span>
+              </li>
+              <li class="flex items-start space-x-2.5">
+                <span class="w-5 h-5 rounded-full bg-amber-400 text-amber-950 font-bold flex items-center justify-center text-xs shrink-0">3</span>
+                <span>Realiza tu depósito/transferencia de anticipo y presiona el botón para enviarlo por WhatsApp. Damaris te confirmará de inmediato.</span>
+              </li>
+            </ol>
 
-            <div class="flex items-center space-x-2 w-full sm:w-auto">
-              <button onclick="setFilterDate('today')" class="px-3 py-1.5 bg-amber-400 text-amber-950 border border-amber-500 text-xs font-bold rounded-lg hover:bg-amber-500 transition-colors">
-                🌻 Citas de Hoy
+            <div class="pt-2">
+              <button onclick="switchTab('payments')" class="w-full py-2.5 bg-yellow-200 hover:bg-yellow-300 text-amber-950 font-bold rounded-xl text-xs border border-amber-400 flex items-center justify-center space-x-1">
+                <i data-lucide="credit-card" class="w-4 h-4"></i>
+                <span>Ver Datos Bancarios y Transferencias</span>
               </button>
-              <button onclick="setFilterDate('all')" class="px-3 py-1.5 bg-yellow-200 text-amber-950 border border-amber-300 text-xs font-bold rounded-lg hover:bg-yellow-300 transition-colors">
-                Todas
-              </button>
-              <input type="date" id="filterDate" onchange="renderAppointments()" class="px-2.5 py-1 bg-white/90 border border-amber-300 rounded-lg text-xs focus:outline-none font-bold text-amber-900">
             </div>
           </div>
 
-          <!-- Listado -->
-          <div id="appointmentsList" class="space-y-3">
-            <!-- Renderizado dinámico -->
+          <!-- Imagen destacada -->
+          <div class="rounded-2xl overflow-hidden border border-amber-300 shadow-md relative h-48">
+            <img src="https://images.unsplash.com/photo-1544161515-4ab6ce6db874?auto=format&fit=crop&w=800&q=80" class="w-full h-full object-cover">
+            <div class="absolute inset-0 bg-gradient-to-t from-amber-950/70 via-transparent to-transparent flex items-end p-4">
+              <p class="text-white text-xs font-bold drop-shadow">Relajación absoluta bajo las mejores manos en Spa de Damaris Vega 🌻</p>
+            </div>
           </div>
         </div>
 
       </div>
     </section>
 
-    <!-- SECCIÓN: CATÁLOGO DE SERVICIOS -->
-    <section id="sec-services" class="hidden space-y-6">
+    <!-- PESTAÑA 2: MÉTODOS DE PAGO Y ANTICIPO -->
+    <section id="sec-payments" class="hidden space-y-6">
+      <div class="max-w-3xl mx-auto bg-yellow-50/95 backdrop-blur-md p-6 rounded-2xl border border-amber-300 shadow-xl space-y-6">
+        <div class="flex items-center justify-between border-b border-amber-200 pb-3">
+          <div class="flex items-center space-x-2">
+            <i data-lucide="qr-code" class="w-6 h-6 text-amber-700"></i>
+            <h2 class="text-xl font-bold font-serif-title text-amber-950">Métodos de Pago & Anticipos</h2>
+          </div>
+          <span class="text-xl">🌻</span>
+        </div>
+
+        <p class="text-xs text-stone-700">Para garantizar tu lugar en la agenda, solicitamos un anticipo sugerido de <b>$200.00 MXN</b> o el pago total del servicio. Realiza tu transferencia a cualquiera de las siguientes cuentas:</p>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <!-- Datos Cuenta 1 -->
+          <div class="p-4 bg-white/90 rounded-xl border border-amber-300 shadow-sm space-y-2">
+            <div class="flex justify-between items-center">
+              <span class="text-xs font-extrabold text-amber-900 uppercase">Transferencia / BBVA</span>
+              <i data-lucide="building-2" class="w-4 h-4 text-amber-700"></i>
+            </div>
+            <div class="text-xs space-y-1 text-stone-800">
+              <p><span class="text-stone-400">Titular:</span> Damaris Vega</p>
+              <p><span class="text-stone-400">CLABE:</span> <b class="font-mono text-amber-950">012180001234567890</b></p>
+              <p><span class="text-stone-400">Tarjeta:</span> <b class="font-mono text-amber-950">4152 3138 9988 1234</b></p>
+            </div>
+          </div>
+
+          <!-- Datos Cuenta 2 / Mercado Pago -->
+          <div class="p-4 bg-white/90 rounded-xl border border-amber-300 shadow-sm space-y-2">
+            <div class="flex justify-between items-center">
+              <span class="text-xs font-extrabold text-amber-900 uppercase">Mercado Pago / OXXO</span>
+              <i data-lucide="wallet" class="w-4 h-4 text-amber-700"></i>
+            </div>
+            <div class="text-xs space-y-1 text-stone-800">
+              <p><span class="text-stone-400">Titular:</span> Damaris Vega</p>
+              <p><span class="text-stone-400">Teléfono / STP:</span> <b class="font-mono text-amber-950">667-123-4567</b></p>
+              <p><span class="text-stone-400">Concepto:</span> Tu Nombre Completo</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="p-4 bg-amber-100/90 rounded-xl border border-amber-300 text-xs text-amber-950 space-y-2">
+          <p class="font-bold flex items-center gap-1">
+            <i data-lucide="message-square text-amber-800" class="w-4 h-4"></i>
+            ¿Ya realizaste tu transferencia?
+          </p>
+          <p class="text-stone-700">Toma captura de pantalla a tu comprobante de pago y envíalo directamente por WhatsApp para activar tu cita.</p>
+          <button onclick="sendReceiptDirect()" class="mt-2 px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-lg text-xs shadow-sm flex items-center space-x-1">
+            <i data-lucide="send" class="w-3.5 h-3.5"></i>
+            <span>Enviar Comprobante por WhatsApp</span>
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <!-- PESTAÑA 3: PANEL DE CITAS (ADMINISTRADOR) -->
+    <section id="sec-admin-schedule" class="hidden space-y-6">
+      <!-- Filtros -->
+      <div class="bg-yellow-50/95 backdrop-blur-md p-4 rounded-2xl border border-amber-300 shadow-lg flex flex-col sm:flex-row items-center justify-between gap-3">
+        <div class="relative flex-1 w-full">
+          <i data-lucide="search" class="w-4 h-4 text-amber-600 absolute left-3 top-1/2 transform -translate-y-1/2"></i>
+          <input type="text" id="searchApp" oninput="renderAdminAppointments()" placeholder="Buscar cliente o teléfono..." class="w-full pl-9 pr-3 py-2 bg-white/90 border border-amber-300 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-amber-500">
+        </div>
+
+        <div class="flex items-center space-x-2 w-full sm:w-auto">
+          <button onclick="setFilterDate('today')" class="px-3 py-1.5 bg-amber-400 text-amber-950 border border-amber-500 text-xs font-bold rounded-lg hover:bg-amber-500 transition-colors">
+            🌻 Citas de Hoy
+          </button>
+          <button onclick="setFilterDate('all')" class="px-3 py-1.5 bg-yellow-200 text-amber-950 border border-amber-300 text-xs font-bold rounded-lg hover:bg-yellow-300 transition-colors">
+            Todas
+          </button>
+          <input type="date" id="filterDate" onchange="renderAdminAppointments()" class="px-2.5 py-1 bg-white/90 border border-amber-300 rounded-lg text-xs focus:outline-none font-bold text-amber-900">
+        </div>
+      </div>
+
+      <!-- Listado Admin -->
+      <div id="adminAppointmentsList" class="space-y-3">
+        <!-- Renderizado dinámico -->
+      </div>
+    </section>
+
+    <!-- PESTAÑA 4: GESTIÓN DE SERVICIOS (ADMINISTRADOR) -->
+    <section id="sec-admin-services" class="hidden space-y-6">
       <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
 
-        <!-- Agregar Servicio -->
+        <!-- Formulario Servicio -->
         <div class="lg:col-span-4 bg-yellow-50/95 backdrop-blur-md p-6 rounded-2xl border border-amber-300 shadow-xl space-y-4">
           <div class="flex items-center space-x-2 border-b border-amber-200 pb-3">
             <i data-lucide="plus-circle" class="w-5 h-5 text-amber-700"></i>
-            <h2 class="text-lg font-bold font-serif-title text-amber-950">Nuevo Servicio o Masaje</h2>
+            <h2 class="text-lg font-bold font-serif-title text-amber-950">Agregar / Editar Servicio</h2>
           </div>
 
           <form onsubmit="saveService(event)" class="space-y-4">
             <div>
               <label class="block text-xs font-bold text-amber-900 mb-1">Nombre del Servicio *</label>
-              <input type="text" id="serviceName" required placeholder="Ej. Masaje Relajante con Aceite de Girasol" class="w-full px-3.5 py-2 rounded-xl border border-amber-300 text-sm focus:outline-none focus:ring-2 focus:ring-amber-500 bg-white/90">
+              <input type="text" id="serviceName" required placeholder="Ej. Masaje Descontracturante" class="w-full px-3.5 py-2 rounded-xl border border-amber-300 text-sm focus:outline-none focus:ring-2 focus:ring-amber-500 bg-white/90">
             </div>
 
             <div class="grid grid-cols-2 gap-3">
@@ -272,7 +379,7 @@
 
             <div>
               <label class="block text-xs font-bold text-amber-900 mb-1">Descripción del servicio</label>
-              <textarea id="serviceDesc" rows="2" placeholder="Incluye aromaterapia, piedras calientes, exfoliación..." class="w-full px-3.5 py-2 rounded-xl border border-amber-300 text-sm focus:outline-none focus:ring-2 focus:ring-amber-500 bg-white/90"></textarea>
+              <textarea id="serviceDesc" rows="2" placeholder="Incluye aromaterapia, aceites relajantes..." class="w-full px-3.5 py-2 rounded-xl border border-amber-300 text-sm focus:outline-none focus:ring-2 focus:ring-amber-500 bg-white/90"></textarea>
             </div>
 
             <button type="submit" class="w-full bg-amber-500 hover:bg-amber-600 text-amber-950 font-bold py-2.5 rounded-xl text-sm transition-all shadow-md flex items-center justify-center space-x-2 border border-amber-600">
@@ -282,16 +389,16 @@
           </form>
         </div>
 
-        <!-- Lista de Servicios -->
+        <!-- Lista Catálogo -->
         <div class="lg:col-span-8">
           <div class="bg-yellow-50/95 backdrop-blur-md p-6 rounded-2xl border border-amber-300 shadow-xl space-y-4">
             <div class="flex justify-between items-center border-b border-amber-200 pb-3">
-              <h2 class="text-lg font-bold font-serif-title text-amber-950">Servicios Disponibles</h2>
+              <h2 class="text-lg font-bold font-serif-title text-amber-950">Catálogo de Servicios Activos</h2>
               <span class="text-xs font-bold text-amber-800 bg-yellow-200 px-3 py-1 rounded-full border border-amber-300">🌻 Menú Spa</span>
             </div>
             
             <div id="servicesList" class="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <!-- Renderizado dinámico -->
+              <!-- JS Inyectado -->
             </div>
           </div>
         </div>
@@ -301,50 +408,237 @@
 
   </main>
 
+  <!-- MODAL INICIO SESION ADMIN -->
+  <div id="modalAdmin" class="fixed inset-0 bg-stone-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
+    <div class="bg-yellow-50 rounded-3xl max-w-sm w-full p-6 shadow-2xl border border-amber-300 space-y-4">
+      <div class="flex justify-between items-center pb-2 border-b border-amber-200">
+        <h3 class="font-serif-title text-lg font-bold text-amber-950 flex items-center gap-1">
+          <i data-lucide="shield-check" class="w-5 h-5 text-amber-700"></i> Acceso Administrador
+        </h3>
+        <button onclick="toggleAdminModal()" class="text-stone-400 hover:text-stone-700">
+          <i data-lucide="x" class="w-5 h-5"></i>
+        </button>
+      </div>
+
+      <p class="text-xs text-stone-700">Ingresa la contraseña para acceder al panel de administración (Contraseña por defecto: <b>1234</b>)</p>
+
+      <form onsubmit="handleAdminLogin(event)" class="space-y-3">
+        <div>
+          <label class="block text-xs font-bold text-amber-900 mb-1">Contraseña</label>
+          <input type="password" id="adminPassword" required placeholder="••••" class="w-full px-3.5 py-2 rounded-xl border border-amber-300 text-sm focus:outline-none focus:ring-2 focus:ring-amber-500 bg-white">
+        </div>
+        <button type="submit" class="w-full py-2.5 bg-amber-950 text-yellow-300 font-bold rounded-xl text-xs hover:bg-amber-900 transition-colors shadow-md">
+          Ingresar al Panel
+        </button>
+      </form>
+    </div>
+  </div>
+
   <script>
-    // --- SERVICIOS POR DEFECTO ---
+    // Horarios laborales estándar del Spa (Ej. 09:00 a 18:00)
+    const WORK_HOURS = ["09:00", "10:00", "11:00", "12:00", "13:00", "15:00", "16:00", "17:00", "18:00"];
+
+    // Datos por defecto
     const defaultServices = [
-      { id: 's1', name: 'Masaje Relajante de Girasol & Aromaterapia', price: 450, duration: 60, desc: 'Masaje corporal descontracturante con aceites esenciales naturales.' },
+      { id: 's1', name: 'Masaje Relajante de Girasol & Aromaterapia', price: 450, duration: 60, desc: 'Masaje corporal descontracturante completo con aceites esenciales de la casa.' },
       { id: 's2', name: 'Facial Hidratante Profundo & Iluminador', price: 500, duration: 50, desc: 'Limpieza facial profunda, exfoliación suave y mascarilla de ácido hialurónico.' },
-      { id: 's3', name: 'Masaje con Piedras Volcánicas Calientes', price: 600, duration: 75, desc: 'Terapia térmica muscular profunda para aliviar estrés acumulado.' }
+      { id: 's3', name: 'Masaje con Piedras Volcánicas Calientes', price: 600, duration: 75, desc: 'Terapia térmica muscular profunda para aliviar la tensión del cuerpo.' }
     ];
 
     let services = JSON.parse(localStorage.getItem('spa_services')) || defaultServices;
     let appointments = JSON.parse(localStorage.getItem('spa_appointments')) || [];
+    let isAdminLoggedIn = false;
 
     document.addEventListener('DOMContentLoaded', () => {
       lucide.createIcons();
-      setTodayDateHeader();
+      setMinBookingDate();
       renderServicesSelect();
       renderServicesList();
-      renderAppointments();
+      renderAdminAppointments();
       checkTodayAlerts();
     });
 
-    function setTodayDateHeader() {
-      const today = new Date();
-      const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
-      document.getElementById('currentDateDisplay').innerText = today.toLocaleDateString('es-ES', options);
-    }
-
-    function switchTab(tab) {
-      document.getElementById('sec-appointments').classList.add('hidden');
-      document.getElementById('sec-services').classList.add('hidden');
-      
-      document.getElementById('tab-appointments').className = "tab-btn px-5 py-2.5 rounded-xl text-sm font-bold flex items-center space-x-2 transition-all text-amber-950 bg-yellow-100/70 hover:bg-amber-200 border border-amber-300";
-      document.getElementById('tab-services').className = "tab-btn px-5 py-2.5 rounded-xl text-sm font-bold flex items-center space-x-2 transition-all text-amber-950 bg-yellow-100/70 hover:bg-amber-200 border border-amber-300";
-
-      if (tab === 'appointments') {
-        document.getElementById('sec-appointments').classList.remove('hidden');
-        document.getElementById('tab-appointments').className = "tab-btn px-5 py-2.5 rounded-xl text-sm font-bold flex items-center space-x-2 transition-all bg-amber-500 text-amber-950 shadow-md border border-amber-600";
-      } else {
-        document.getElementById('sec-services').classList.remove('hidden');
-        document.getElementById('tab-services').className = "tab-btn px-5 py-2.5 rounded-xl text-sm font-bold flex items-center space-x-2 transition-all bg-amber-500 text-amber-950 shadow-md border border-amber-600";
+    function setMinBookingDate() {
+      const today = new Date().toISOString().split('T')[0];
+      const custDate = document.getElementById('custDate');
+      if (custDate) {
+        custDate.min = today;
+        custDate.value = today;
+        updateAvailableHours();
       }
     }
 
+    // --- ACCESO ADMINISTRADOR ---
+    function toggleAdminModal() {
+      if (isAdminLoggedIn) {
+        // Cerrar sesión
+        isAdminLoggedIn = false;
+        document.getElementById('btnAdminText').innerText = 'Acceso Admin';
+        document.getElementById('modeBadgeText').innerText = 'Vista Cliente';
+        document.getElementById('tab-admin-schedule').classList.add('hidden');
+        document.getElementById('tab-admin-services').classList.add('hidden');
+        document.getElementById('adminAlertBanner').classList.add('hidden');
+        switchTab('booking');
+      } else {
+        document.getElementById('modalAdmin').classList.remove('hidden');
+      }
+    }
+
+    function handleAdminLogin(e) {
+      e.preventDefault();
+      const pass = document.getElementById('adminPassword').value;
+      if (pass === '1234' || pass === 'admin') {
+        isAdminLoggedIn = true;
+        document.getElementById('modalAdmin').classList.add('hidden');
+        document.getElementById('adminPassword').value = '';
+        
+        document.getElementById('btnAdminText').innerText = 'Cerrar Sesión Admin';
+        document.getElementById('modeBadgeText').innerText = 'Modo Administrador';
+        document.getElementById('tab-admin-schedule').classList.remove('hidden');
+        document.getElementById('tab-admin-services').classList.remove('hidden');
+        
+        checkTodayAlerts();
+        switchTab('admin-schedule');
+      } else {
+        alert('Contraseña incorrecta. Intenta nuevamente.');
+      }
+    }
+
+    // --- CAMBIO DE PESTAÑAS ---
+    function switchTab(tab) {
+      const tabs = ['booking', 'payments', 'admin-schedule', 'admin-services'];
+      tabs.forEach(t => {
+        const sec = document.getElementById(`sec-${t}`);
+        const btn = document.getElementById(`tab-${t}`);
+        if (sec) sec.classList.add('hidden');
+        if (btn) {
+          btn.className = "tab-btn px-5 py-2.5 rounded-xl text-sm font-bold flex items-center space-x-2 transition-all text-amber-950 bg-yellow-100/70 hover:bg-amber-200 border border-amber-300";
+        }
+      });
+
+      const activeSec = document.getElementById(`sec-${tab}`);
+      const activeBtn = document.getElementById(`tab-${tab}`);
+      if (activeSec) activeSec.classList.remove('hidden');
+      if (activeBtn) {
+        activeBtn.className = "tab-btn px-5 py-2.5 rounded-xl text-sm font-bold flex items-center space-x-2 transition-all bg-amber-500 text-amber-950 shadow-md border border-amber-600";
+      }
+    }
+
+    // --- CÁLCULO DE DISPONIBILIDAD ---
+    function updateAvailableHours() {
+      const selectedDate = document.getElementById('custDate').value;
+      const selectTime = document.getElementById('custTime');
+      selectTime.innerHTML = '';
+
+      if (!selectedDate) {
+        selectTime.innerHTML = '<option value="">Selecciona fecha primero...</option>';
+        return;
+      }
+
+      // Filtrar citas existentes en esa fecha
+      const takenHours = appointments
+        .filter(a => a.date === selectedDate)
+        .map(a => a.time);
+
+      const availableHours = WORK_HOURS.filter(h => !takenHours.includes(h));
+
+      if (availableHours.length === 0) {
+        selectTime.innerHTML = '<option value="">Sin horarios disponibles este día</option>';
+      } else {
+        availableHours.forEach(h => {
+          selectTime.innerHTML += `<option value="${h}">${h} hs</option>`;
+        });
+      }
+    }
+
+    function updateServiceInfo() {
+      const sName = document.getElementById('custService').value;
+      const box = document.getElementById('serviceDetailBox');
+      const sObj = services.find(s => s.name === sName);
+
+      if (sObj) {
+        box.classList.remove('hidden');
+        document.getElementById('boxServiceName').innerText = sObj.name;
+        document.getElementById('boxServicePrice').innerText = `$${parseFloat(sObj.price).toFixed(2)} (${sObj.duration} min)`;
+        document.getElementById('boxServiceDesc').innerText = sObj.desc || 'Servicio de spa y relajación profesional.';
+      } else {
+        box.classList.add('hidden');
+      }
+    }
+
+    // --- RESERVA PÚBLICA (MODO CLIENTE) ---
+    function handlePublicBooking(e) {
+      e.preventDefault();
+      const name = document.getElementById('custName').value.trim();
+      const phone = document.getElementById('custPhone').value.trim();
+      const service = document.getElementById('custService').value;
+      const date = document.getElementById('custDate').value;
+      const time = document.getElementById('custTime').value;
+      const notes = document.getElementById('custNotes').value.trim();
+
+      if (!time) {
+        alert('Por favor selecciona un horario disponible.');
+        return;
+      }
+
+      const newApp = {
+        id: 'app_' + Date.now(),
+        name,
+        phone,
+        service,
+        date,
+        time,
+        deposit: 0,
+        paymentStatus: 'Pendiente',
+        notes
+      };
+
+      appointments.push(newApp);
+      localStorage.setItem('spa_appointments', JSON.stringify(appointments));
+
+      playAlertSound();
+      alert('¡Tu cita se ha registrado temporalmente! Procede a confirmar tu horario en WhatsApp.');
+
+      // Abrir enlace de WhatsApp
+      sendWhatsAppBookingRequest(newApp);
+      
+      e.target.reset();
+      setMinBookingDate();
+      renderAdminAppointments();
+      checkTodayAlerts();
+    }
+
+    function sendWhatsAppBookingRequest(app) {
+      const cleanPhone = '521' + app.phone.replace(/\D/g, ''); // Número Spa de Damaris (o del cliente)
+      const text = `Hola *Spa de Damaris Vega* 🌻, acabo de solicitar una cita en su página web:\n\n👤 *Cliente:* ${app.name}\n💆‍♀️ *Servicio:* ${app.service}\n🗓 *Fecha:* ${formatDateDisplay(app.date)}\n⏰ *Hora:* ${app.time} hs\n\nQuiero confirmar la disponibilidad y enviar mi comprobante de anticipo. ✨`;
+      const url = `https://wa.me/?text=${encodeURIComponent(text)}`;
+      window.open(url, '_blank');
+    }
+
+    function sendReceiptDirect() {
+      const text = `Hola *Spa de Damaris Vega* 🌻, adjunto mi comprobante de pago/anticipo para confirmar mi cita. ¡Muchas gracias! ✨`;
+      const url = `https://wa.me/?text=${encodeURIComponent(text)}`;
+      window.open(url, '_blank');
+    }
+
+    // --- SEGUIMIENTO AUTOMÁTICO WHATSAPP (PANEL ADMIN) ---
+    function sendAdminFollowUpWhatsApp(id) {
+      const app = appointments.find(a => a.id === id);
+      if (!app) return;
+
+      const cleanPhone = app.phone.replace(/\D/g, '');
+      const formattedPhone = cleanPhone.length === 10 ? '52' + cleanPhone : cleanPhone;
+
+      const text = `Hola buenos días ${app.name} 🌸✨, te hablamos del *Spa de Damaris Vega* 🌻. Veo que estás interesada en nuestro servicio de *${app.service}* y agendaste para el día *${formatDateDisplay(app.date)}* a las *${app.time} hs*. Nos comunicamos para confirmar tu asistencia y brindarte los detalles de tu cita. ¿Nos confirmas por favor? 😊`;
+
+      const url = `https://wa.me/${formattedPhone}?text=${encodeURIComponent(text)}`;
+      window.open(url, '_blank');
+    }
+
+    // --- GESTIÓN DE SERVICIOS ---
     function renderServicesSelect() {
-      const select = document.getElementById('appService');
+      const select = document.getElementById('custService');
+      if (!select) return;
       select.innerHTML = '<option value="">Selecciona un masaje o servicio...</option>';
       services.forEach(s => {
         select.innerHTML += `<option value="${s.name}">${s.name} - $${s.price}</option>`;
@@ -353,6 +647,7 @@
 
     function renderServicesList() {
       const container = document.getElementById('servicesList');
+      if (!container) return;
       if (services.length === 0) {
         container.innerHTML = '<p class="text-xs text-amber-700 col-span-2">No hay servicios registrados.</p>';
         return;
@@ -361,7 +656,7 @@
         <div class="p-4 bg-white/90 backdrop-blur-sm rounded-xl border border-amber-300 shadow-sm flex flex-col justify-between">
           <div>
             <div class="flex justify-between items-start">
-              <h3 class="font-bold text-amber-950 flex items-center gap-1">
+              <h3 class="font-bold text-amber-950 flex items-center gap-1 text-sm">
                 <span>🌻</span> ${s.name}
               </h3>
               <span class="text-xs font-extrabold text-amber-950 bg-yellow-300 px-2 py-0.5 rounded-md border border-amber-400">$${parseFloat(s.price).toFixed(2)}</span>
@@ -404,80 +699,10 @@
       }
     }
 
-    function saveAppointment(e) {
-      e.preventDefault();
-      const id = document.getElementById('appId').value || 'app_' + Date.now();
-      const name = document.getElementById('clientName').value.trim();
-      const phone = document.getElementById('clientPhone').value.trim();
-      const service = document.getElementById('appService').value;
-      const date = document.getElementById('appDate').value;
-      const time = document.getElementById('appTime').value;
-      const deposit = parseFloat(document.getElementById('appDeposit').value) || 0;
-      const paymentStatus = document.getElementById('appPaymentStatus').value;
-      const notes = document.getElementById('appNotes').value.trim();
-
-      const existingIndex = appointments.findIndex(a => a.id === id);
-      const appData = { id, name, phone, service, date, time, deposit, paymentStatus, notes };
-
-      if (existingIndex >= 0) {
-        appointments[existingIndex] = appData;
-      } else {
-        appointments.push(appData);
-        sendWhatsAppConfirmation(appData);
-      }
-
-      localStorage.setItem('spa_appointments', JSON.stringify(appointments));
-      resetAppForm();
-      renderAppointments();
-      checkTodayAlerts();
-    }
-
-    function resetAppForm() {
-      document.getElementById('appId').value = '';
-      document.getElementById('appointmentForm').reset();
-      document.getElementById('btnSubmitApp').querySelector('span').innerText = 'Agendar Cita';
-    }
-
-    function editAppointment(id) {
-      const app = appointments.find(a => a.id === id);
-      if (!app) return;
-
-      document.getElementById('appId').value = app.id;
-      document.getElementById('clientName').value = app.name;
-      document.getElementById('clientPhone').value = app.phone;
-      document.getElementById('appService').value = app.service;
-      document.getElementById('appDate').value = app.date;
-      document.getElementById('appTime').value = app.time;
-      document.getElementById('appDeposit').value = app.deposit;
-      document.getElementById('appPaymentStatus').value = app.paymentStatus;
-      document.getElementById('appNotes').value = app.notes || '';
-
-      document.getElementById('btnSubmitApp').querySelector('span').innerText = 'Actualizar Cita';
-      window.scrollTo({ top: 0, behavior: 'smooth' });
-    }
-
-    function deleteAppointment(id) {
-      if (confirm('¿Seguro que deseas eliminar esta cita?')) {
-        appointments = appointments.filter(a => a.id !== id);
-        localStorage.setItem('spa_appointments', JSON.stringify(appointments));
-        renderAppointments();
-        checkTodayAlerts();
-      }
-    }
-
-    function setFilterDate(type) {
-      const input = document.getElementById('filterDate');
-      if (type === 'today') {
-        const today = new Date().toISOString().split('T')[0];
-        input.value = today;
-      } else {
-        input.value = '';
-      }
-      renderAppointments();
-    }
-
-    function renderAppointments() {
-      const container = document.getElementById('appointmentsList');
+    // --- RENDERIZADO CITAS ADMIN ---
+    function renderAdminAppointments() {
+      const container = document.getElementById('adminAppointmentsList');
+      if (!container) return;
       const search = document.getElementById('searchApp').value.toLowerCase();
       const dateFilter = document.getElementById('filterDate').value;
 
@@ -493,14 +718,9 @@
 
       if (filtered.length === 0) {
         container.innerHTML = `
-          <div class="empty-state-bg p-10 rounded-2xl border-2 border-amber-300 shadow-lg text-center space-y-3">
-            <div class="w-16 h-16 mx-auto bg-amber-400/80 border border-amber-500 rounded-full flex items-center justify-center text-amber-950 shadow-md">
-              <i data-lucide="flower-2" class="w-8 h-8"></i>
-            </div>
-            <div>
-              <h3 class="text-base font-bold font-serif-title text-amber-950">No hay citas registradas</h3>
-              <p class="text-xs font-semibold text-amber-900 mt-1">Utiliza el formulario de la izquierda para agendar una nueva cita de masaje o facial.</p>
-            </div>
+          <div class="empty-state-bg p-8 rounded-2xl border-2 border-amber-300 shadow-lg text-center space-y-2">
+            <i data-lucide="calendar-x" class="w-10 h-10 mx-auto text-amber-700 opacity-60"></i>
+            <h3 class="text-sm font-bold font-serif-title text-amber-950">Sin citas agendadas</h3>
           </div>
         `;
         lucide.createIcons();
@@ -510,7 +730,7 @@
       container.innerHTML = filtered.map(a => {
         const isToday = a.date === todayStr;
         return `
-          <div class="bg-white/95 backdrop-blur-md p-5 rounded-2xl border ${isToday ? 'border-amber-500 ring-2 ring-amber-400' : 'border-amber-200'} shadow-md transition-all hover:shadow-lg">
+          <div class="bg-white/95 backdrop-blur-md p-5 rounded-2xl border ${isToday ? 'border-amber-500 ring-2 ring-amber-400' : 'border-amber-200'} shadow-md transition-all">
             <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 border-b border-amber-100 pb-3">
               <div>
                 <div class="flex items-center space-x-2">
@@ -523,9 +743,10 @@
               </div>
 
               <div class="flex items-center space-x-2">
-                <button onclick="sendWhatsAppReminder('${a.id}')" class="px-3 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold rounded-lg flex items-center space-x-1 shadow-sm transition-all">
+                <!-- Botón de mensaje de seguimiento automático solicitado -->
+                <button onclick="sendAdminFollowUpWhatsApp('${a.id}')" class="px-3 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold rounded-lg flex items-center space-x-1.5 shadow-sm transition-all">
                   <i data-lucide="message-circle" class="w-3.5 h-3.5"></i>
-                  <span>WhatsApp Recordatorio</span>
+                  <span>Enviar Seguimiento</span>
                 </button>
               </div>
             </div>
@@ -541,18 +762,24 @@
               </div>
               <div>
                 <span class="text-amber-700 block font-bold">Anticipo / Pago</span>
-                <span class="font-bold text-emerald-700">$${parseFloat(a.deposit).toFixed(2)} (${a.paymentStatus})</span>
+                <input type="number" value="${a.deposit}" onchange="updateDeposit('${a.id}', this.value)" class="w-20 px-2 py-0.5 border border-amber-300 rounded font-bold text-emerald-700 bg-white">
               </div>
               <div>
                 <span class="text-amber-700 block font-bold">Notas</span>
-                <span class="text-stone-600 italic">${a.notes || 'Sin especificaciones'}</span>
+                <span class="text-stone-600 italic">${a.notes || 'Sin especificarse'}</span>
               </div>
             </div>
 
-            <div class="flex justify-end space-x-3 border-t border-amber-100 pt-2 text-xs">
-              <button onclick="editAppointment('${a.id}')" class="text-amber-900 hover:text-amber-600 font-bold flex items-center">
-                <i data-lucide="edit-3" class="w-3.5 h-3.5 mr-1"></i> Editar
-              </button>
+            <div class="flex justify-between items-center border-t border-amber-100 pt-2 text-xs">
+              <div class="flex items-center space-x-2">
+                <span class="text-stone-500 font-semibold">Estado:</span>
+                <select onchange="updatePaymentStatus('${a.id}', this.value)" class="px-2 py-1 border border-amber-300 rounded bg-white font-bold text-xs text-amber-950">
+                  <option value="Pendiente" ${a.paymentStatus === 'Pendiente' ? 'selected' : ''}>Pendiente</option>
+                  <option value="Anticipo" ${a.paymentStatus === 'Anticipo' ? 'selected' : ''}>Anticipo Recibido</option>
+                  <option value="Pagado Completo" ${a.paymentStatus === 'Pagado Completo' ? 'selected' : ''}>Pagado Completo</option>
+                </select>
+              </div>
+
               <button onclick="deleteAppointment('${a.id}')" class="text-red-700 hover:text-red-900 font-bold flex items-center">
                 <i data-lucide="trash-2" class="w-3.5 h-3.5 mr-1"></i> Eliminar
               </button>
@@ -564,46 +791,53 @@
       lucide.createIcons();
     }
 
-    function formatDateDisplay(dateStr) {
-      if (!dateStr) return '';
-      const parts = dateStr.split('-');
-      return `${parts[2]}/${parts[1]}/${parts[0]}`;
-    }
-
-    function sendWhatsAppConfirmation(app) {
-      const cleanPhone = app.phone.replace(/\D/g, '');
-      const text = `Hola ${app.name}, te confirmamos tu cita en el *Spa de Damaris Vega* 🌻 para el día *${formatDateDisplay(app.date)}* a las *${app.time} hs* para tu servicio de *${app.service}*. Registramos tu anticipo/pago de *$${app.deposit}*. ¡Será un gusto atenderte! ✨💆‍♀️`;
-      const url = `https://wa.me/52${cleanPhone}?text=${encodeURIComponent(text)}`;
-      window.open(url, '_blank');
-    }
-
-    function sendWhatsAppReminder(id) {
+    function updateDeposit(id, val) {
       const app = appointments.find(a => a.id === id);
-      if (!app) return;
-      const cleanPhone = app.phone.replace(/\D/g, '');
-      const text = `Hola ${app.name}, te hablamos del *Spa de Damaris Vega* 🌻 para recordarte que tienes tu cita el día de hoy (*${formatDateDisplay(app.date)}*) a las *${app.time} hs* para tu servicio de *${app.service}*. ¡Te esperamos para consentirte y relajarte! ✨🌿`;
-      const url = `https://wa.me/52${cleanPhone}?text=${encodeURIComponent(text)}`;
-      window.open(url, '_blank');
+      if (app) {
+        app.deposit = parseFloat(val) || 0;
+        localStorage.setItem('spa_appointments', JSON.stringify(appointments));
+      }
+    }
+
+    function updatePaymentStatus(id, val) {
+      const app = appointments.find(a => a.id === id);
+      if (app) {
+        app.paymentStatus = val;
+        localStorage.setItem('spa_appointments', JSON.stringify(appointments));
+      }
+    }
+
+    function deleteAppointment(id) {
+      if (confirm('¿Seguro que deseas eliminar esta cita?')) {
+        appointments = appointments.filter(a => a.id !== id);
+        localStorage.setItem('spa_appointments', JSON.stringify(appointments));
+        renderAdminAppointments();
+        updateAvailableHours();
+        checkTodayAlerts();
+      }
+    }
+
+    function setFilterDate(type) {
+      const input = document.getElementById('filterDate');
+      if (type === 'today') {
+        const today = new Date().toISOString().split('T')[0];
+        input.value = today;
+      } else {
+        input.value = '';
+      }
+      renderAdminAppointments();
     }
 
     function checkTodayAlerts() {
+      if (!isAdminLoggedIn) return;
       const todayStr = new Date().toISOString().split('T')[0];
       const todayApps = appointments.filter(a => a.date === todayStr);
 
-      const alertBadge = document.getElementById('todayAlertBadge');
-      const alertBanner = document.getElementById('alertBanner');
-      const alertCount = document.getElementById('todayAlertCount');
-      const bannerText = document.getElementById('alertBannerText');
-
+      const alertBanner = document.getElementById('adminAlertBanner');
       if (todayApps.length > 0) {
-        alertCount.innerText = `${todayApps.length} Cita(s) Hoy 🌻`;
-        bannerText.innerText = `Tienes ${todayApps.length} persona(s) agendada(s) para hoy. Haz clic para enviarles su recordatorio por WhatsApp.`;
         alertBanner.classList.remove('hidden');
-        alertBadge.className = "flex items-center space-x-2 px-3.5 py-1.5 rounded-full text-xs font-bold bg-amber-400 text-amber-950 border border-amber-500 shadow-sm";
       } else {
-        alertCount.innerText = `Sin citas hoy`;
         alertBanner.classList.add('hidden');
-        alertBadge.className = "flex items-center space-x-2 px-3.5 py-1.5 rounded-full text-xs font-bold bg-yellow-200 text-amber-900 border border-amber-300";
       }
     }
 
@@ -611,6 +845,29 @@
       setFilterDate('today');
       window.scrollTo({ top: 350, behavior: 'smooth' });
     }
+
+    function formatDateDisplay(dateStr) {
+      if (!dateStr) return '';
+      const parts = dateStr.split('-');
+      return `${parts[2]}/${parts[1]}/${parts[0]}`;
+    }
+
+    function playAlertSound() {
+      try {
+        const ctx = new (window.AudioContext || window.webkitAudioContext)();
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(587.33, ctx.currentTime);
+        gain.gain.setValueAtTime(0.1, ctx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.4);
+        osc.connect(gain);
+        gain.connect(ctx.destination);
+        osc.start();
+        osc.stop(ctx.currentTime + 0.4);
+      } catch(e){}
+    }
   </script>
 </body>
 </html>
+```
