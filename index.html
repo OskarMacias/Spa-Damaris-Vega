@@ -4,6 +4,12 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Spa de Damaris Vega - Agendar Cita</title>
+  
+  <!-- Configuración PWA (Aplicación Instalable) -->
+  <link rel="manifest" href="manifest.json">
+  <meta name="theme-color" content="#F59E0B">
+  <link rel="apple-touch-icon" href="https://cdn-icons-png.flaticon.com/512/3175/3175155.png">
+
   <!-- Tailwind CSS CDN -->
   <script src="https://cdn.tailwindcss.com"></script>
   <!-- Lucide Icons CDN -->
@@ -568,9 +574,9 @@
 
     const availableTimeSlots = ["09:00", "10:30", "12:00", "14:00", "15:30", "17:00", "18:30"];
 
-    let services = JSON.parse(localStorage.getItem('spa_services')) || defaultServices;
-    let appointments = JSON.parse(localStorage.getItem('spa_appointments')) || [];
-    let paymentAccounts = JSON.parse(localStorage.getItem('spa_payment_accounts')) || defaultAccounts;
+    let services = [];
+    let appointments = [];
+    let paymentAccounts = [];
     let promoConfig = JSON.parse(localStorage.getItem('spa_promo_config')) || { comboDiscount: 10, bannerText: '✨ ¡15% de descuento este fin de semana al registrarte! ✨' };
     
     let adminPassword = localStorage.getItem('spa_admin_pass') || '1234';
@@ -581,15 +587,7 @@
       lucide.createIcons();
       setMinDateToday();
       checkPersistentSession();
-      renderClientServicesCheckboxes();
-      renderClientCatalog();
-      renderClientPaymentAccounts();
-      renderAdminServicesList();
-      renderAdminAppointments();
-      renderAdminClientsList();
-      renderAdminAccountsList();
       loadPromoConfigToForm();
-      checkAdminAlerts();
       initRealtimeListener();
     });
 
@@ -611,50 +609,57 @@
       }
     }
 
-    // LISTENER EN TIEMPO REAL (CITAS, CUENTAS Y SERVICIOS)
+    // LISTENER EN TIEMPO REAL (CITAS, CUENTAS Y SERVICIOS DESDE FIREBASE)
     function initRealtimeListener() {
       if (isFirebaseActive && firebase.database) {
-        // Citas en tiempo real
+        // 1. Citas en tiempo real
         const dbRefCitas = firebase.database().ref('citas');
+        dbRefCitas.on('value', (snapshot) => {
+          const data = snapshot.val();
+          appointments = data ? Object.values(data) : [];
+          localStorage.setItem('spa_appointments', JSON.stringify(appointments));
+          renderAdminAppointments();
+          renderAdminClientsList();
+          checkAdminAlerts();
+        });
+
+        // Evento específico para notificación flotante de nueva cita
         dbRefCitas.on('child_added', (snapshot) => {
           const newApp = snapshot.val();
-          if (newApp && !appointments.some(a => a.id === newApp.id)) {
-            appointments.push(newApp);
-            localStorage.setItem('spa_appointments', JSON.stringify(appointments));
-            renderAdminAppointments();
-            renderAdminClientsList();
-            checkAdminAlerts();
-            triggerRealtimePopup(newApp);
+          if (newApp && !window._initialLoadDone) {
+            // Evita disparar audio masivo al cargar la página por primera vez
+            return;
           }
         });
 
-        // Cuentas de pago en tiempo real
+        setTimeout(() => { window._initialLoadDone = true; }, 1500);
+
+        // 2. Cuentas de pago en tiempo real
         const dbRefCuentas = firebase.database().ref('cuentas');
         dbRefCuentas.on('value', (snapshot) => {
           const data = snapshot.val();
           if (data) {
             paymentAccounts = Object.values(data);
-            localStorage.setItem('spa_payment_accounts', JSON.stringify(paymentAccounts));
           } else {
             paymentAccounts = defaultAccounts;
+            paymentAccounts.forEach(acc => firebase.database().ref('cuentas/' + acc.id).set(acc));
           }
+          localStorage.setItem('spa_payment_accounts', JSON.stringify(paymentAccounts));
           renderClientPaymentAccounts();
           renderAdminAccountsList();
         });
 
-        // Catálogo de Servicios en tiempo real (Firebase)
+        // 3. Catálogo de Servicios en tiempo real
         const dbRefServicios = firebase.database().ref('servicios');
         dbRefServicios.on('value', (snapshot) => {
           const data = snapshot.val();
           if (data) {
             services = Object.values(data);
-            localStorage.setItem('spa_services', JSON.stringify(services));
           } else {
             services = defaultServices;
-            services.forEach(s => {
-              firebase.database().ref('servicios/' + s.id).set(s);
-            });
+            services.forEach(s => firebase.database().ref('servicios/' + s.id).set(s));
           }
+          localStorage.setItem('spa_services', JSON.stringify(services));
           renderClientServicesCheckboxes();
           renderClientCatalog();
           renderAdminServicesList();
@@ -802,6 +807,7 @@
     // --- CLIENTE: SELECCIÓN MÚLTIPLE Y PAQUETES ---
     function renderClientServicesCheckboxes() {
       const container = document.getElementById('clientServicesCheckboxes');
+      if (!container) return;
       if (services.length === 0) {
         container.innerHTML = '<p class="text-xs text-stone-500">No hay servicios disponibles.</p>';
         return;
@@ -882,6 +888,7 @@
 
     function renderClientCatalog() {
       const container = document.getElementById('clientCatalogList');
+      if (!container) return;
       
       let html = '';
       if (promoConfig.bannerText) {
@@ -912,6 +919,7 @@
 
     function renderClientPaymentAccounts() {
       const container = document.getElementById('paymentAccountsClientList');
+      if (!container) return;
       if (paymentAccounts.length === 0) {
         container.innerHTML = '<p class="text-xs text-amber-800 col-span-2 text-center">No hay cuentas bancarias registradas.</p>';
         return;
@@ -982,11 +990,11 @@
         adminNotes: ''
       };
 
-      appointments.push(newApp);
-      localStorage.setItem('spa_appointments', JSON.stringify(appointments));
-
       if (isFirebaseActive && firebase.database) {
         firebase.database().ref('citas/' + newApp.id).set(newApp);
+      } else {
+        appointments.push(newApp);
+        localStorage.setItem('spa_appointments', JSON.stringify(appointments));
       }
 
       const parts = date.split('-');
@@ -1009,6 +1017,7 @@
     // --- BASE DE DATOS DE CLIENTES E HISTORIAL ---
     function renderAdminClientsList() {
       const container = document.getElementById('adminClientsList');
+      if (!container) return;
       const search = document.getElementById('searchClientDb').value.toLowerCase();
 
       const clientsMap = {};
@@ -1107,6 +1116,7 @@
 
     function renderAdminAppointments() {
       const container = document.getElementById('adminAppointmentsList');
+      if (!container) return;
       const search = document.getElementById('searchApp').value.toLowerCase();
       const dateInputFilter = document.getElementById('filterDate').value;
       const todayStr = new Date().toISOString().split('T')[0];
@@ -1203,34 +1213,21 @@
     }
 
     function updateAppointmentDate(id, newDate) {
-      const app = appointments.find(a => a.id === id);
-      if (app && newDate) {
-        app.date = newDate;
-        localStorage.setItem('spa_appointments', JSON.stringify(appointments));
-        if (isFirebaseActive && firebase.database) firebase.database().ref('citas/' + id).update({ date: newDate });
-        renderAdminAppointments();
-        checkAdminAlerts();
+      if (isFirebaseActive && firebase.database) {
+        firebase.database().ref('citas/' + id).update({ date: newDate });
       }
     }
 
     function updateAppointmentTime(id, newTime) {
-      const app = appointments.find(a => a.id === id);
-      if (app && newTime) {
-        app.time = newTime;
-        localStorage.setItem('spa_appointments', JSON.stringify(appointments));
-        if (isFirebaseActive && firebase.database) firebase.database().ref('citas/' + id).update({ time: newTime });
-        renderAdminAppointments();
-        checkAdminAlerts();
+      if (isFirebaseActive && firebase.database) {
+        firebase.database().ref('citas/' + id).update({ time: newTime });
       }
     }
 
     function updateDeposit(id, val) {
-      const app = appointments.find(a => a.id === id);
-      if (app) {
-        app.deposit = parseFloat(val) || 0;
-        localStorage.setItem('spa_appointments', JSON.stringify(appointments));
-        if (isFirebaseActive && firebase.database) firebase.database().ref('citas/' + id).update({ deposit: app.deposit });
-        renderAdminAppointments();
+      const depositVal = parseFloat(val) || 0;
+      if (isFirebaseActive && firebase.database) {
+        firebase.database().ref('citas/' + id).update({ deposit: depositVal });
       }
     }
 
@@ -1246,29 +1243,23 @@
     }
 
     function updatePaymentStatus(id, newStatus) {
-      const app = appointments.find(a => a.id === id);
-      if (app) {
-        app.paymentStatus = newStatus;
-        localStorage.setItem('spa_appointments', JSON.stringify(appointments));
-        if (isFirebaseActive && firebase.database) firebase.database().ref('citas/' + id).update({ paymentStatus: newStatus });
-        renderAdminAppointments();
+      if (isFirebaseActive && firebase.database) {
+        firebase.database().ref('citas/' + id).update({ paymentStatus: newStatus });
       }
     }
 
     function deleteAppointment(id) {
       if (confirm('¿Eliminar cita del registro?')) {
-        appointments = appointments.filter(a => a.id !== id);
-        localStorage.setItem('spa_appointments', JSON.stringify(appointments));
-        if (isFirebaseActive && firebase.database) firebase.database().ref('citas/' + id).remove();
-        renderAdminAppointments();
-        renderAdminClientsList();
-        checkAdminAlerts();
+        if (isFirebaseActive && firebase.database) {
+          firebase.database().ref('citas/' + id).remove();
+        }
       }
     }
 
     // --- GESTIÓN Y EDICIÓN DE SERVICIOS Y PROMOCIONES ---
     function renderAdminServicesList() {
       const container = document.getElementById('adminServicesList');
+      if (!container) return;
       container.innerHTML = services.map(s => `
         <div class="p-4 bg-white/90 rounded-xl border border-amber-300 shadow-sm flex flex-col justify-between space-y-2">
           <div>
@@ -1303,23 +1294,11 @@
 
       const serviceObj = { id, name, price, minDeposit, duration, desc, requirements };
 
-      // Guardar en Firebase para sincronizar en tiempo real con todos los dispositivos
       if (isFirebaseActive && firebase.database) {
         firebase.database().ref('servicios/' + id).set(serviceObj);
       }
 
-      const idx = services.findIndex(s => s.id === id);
-      if (idx !== -1) {
-        services[idx] = serviceObj;
-      } else {
-        services.push(serviceObj);
-      }
-
-      localStorage.setItem('spa_services', JSON.stringify(services));
       resetServiceForm();
-      renderClientServicesCheckboxes();
-      renderClientCatalog();
-      renderAdminServicesList();
       alert('¡Servicio guardado y sincronizado correctamente en la nube!');
     }
 
@@ -1342,7 +1321,8 @@
 
     function resetServiceForm() {
       document.getElementById('editServiceId').value = '';
-      document.querySelector('form').reset();
+      const form = document.querySelector('#sec-admin-services form');
+      if (form) form.reset();
       document.getElementById('serviceFormTitle').innerText = 'Agregar / Editar Servicio';
       document.getElementById('serviceSubmitBtnText').innerText = 'Guardar Servicio';
       document.getElementById('cancelEditServiceBtn').classList.add('hidden');
@@ -1350,16 +1330,9 @@
 
     function deleteService(id) {
       if (confirm('¿Eliminar servicio del catálogo?')) {
-        services = services.filter(s => s.id !== id);
-        localStorage.setItem('spa_services', JSON.stringify(services));
-
         if (isFirebaseActive && firebase.database) {
           firebase.database().ref('servicios/' + id).remove();
         }
-
-        renderClientServicesCheckboxes();
-        renderClientCatalog();
-        renderAdminServicesList();
       }
     }
 
@@ -1375,13 +1348,16 @@
     }
 
     function loadPromoConfigToForm() {
-      document.getElementById('comboDiscount').value = promoConfig.comboDiscount || '';
-      document.getElementById('promoBannerText').value = promoConfig.bannerText || '';
+      const comboInput = document.getElementById('comboDiscount');
+      const bannerInput = document.getElementById('promoBannerText');
+      if (comboInput) comboInput.value = promoConfig.comboDiscount || '';
+      if (bannerInput) bannerInput.value = promoConfig.bannerText || '';
     }
 
     // --- CUENTAS ADMIN ---
     function renderAdminAccountsList() {
       const container = document.getElementById('adminAccountsList');
+      if (!container) return;
       if (paymentAccounts.length === 0) {
         container.innerHTML = '<p class="text-xs text-amber-800 col-span-2">No hay cuentas configuradas.</p>';
         return;
@@ -1410,8 +1386,6 @@
       const notes = document.getElementById('accNotes').value.trim();
 
       const newAccount = { id: 'acc_' + Date.now(), bank, owner, number, notes };
-      paymentAccounts.push(newAccount);
-      localStorage.setItem('spa_payment_accounts', JSON.stringify(paymentAccounts));
 
       if (isFirebaseActive && firebase.database) {
         firebase.database().ref('cuentas/' + newAccount.id).set(newAccount);
@@ -1424,15 +1398,9 @@
 
     function deletePaymentAccount(id) {
       if (confirm('¿Deseas eliminar esta cuenta de pago?')) {
-        paymentAccounts = paymentAccounts.filter(a => a.id !== id);
-        localStorage.setItem('spa_payment_accounts', JSON.stringify(paymentAccounts));
-
         if (isFirebaseActive && firebase.database) {
           firebase.database().ref('cuentas/' + id).remove();
         }
-
-        renderClientPaymentAccounts();
-        renderAdminAccountsList();
       }
     }
 
@@ -1450,6 +1418,15 @@
       } else {
         banner.classList.add('hidden');
       }
+    }
+  </script>
+
+  <!-- Registro del Service Worker para PWA -->
+  <script>
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('sw.js')
+        .then(() => console.log('Service Worker registrado con éxito.'))
+        .catch((err) => console.log('Error al registrar Service Worker:', err));
     }
   </script>
 </body>
