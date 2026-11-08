@@ -1,0 +1,577 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Spa de Damaris Vega - Gestión de Citas</title>
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Lucide Icons CDN -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;600;700&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap');
+    
+    body {
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      background-color: #FAF7F5;
+      color: #332C2B;
+    }
+    
+    .font-serif-title {
+      font-family: 'Cormorant Garamond', serif;
+    }
+
+    /* Custom Scrollbar */
+    ::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+    ::-webkit-scrollbar-track {
+      background: #F3EEEA;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: #D4C3B7;
+      border-radius: 4px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: #B8A394;
+    }
+  </style>
+</head>
+<body class="min-h-screen flex flex-col antialiased selection:bg-rose-100 selection:text-rose-900">
+
+  <!-- TOP HEADER BANNER -->
+  <header class="bg-white border-b border-rose-100 shadow-sm sticky top-0 z-30">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between">
+      <div class="flex items-center space-x-3">
+        <div class="w-11 h-11 rounded-full bg-rose-50 border border-rose-200 flex items-center justify-center text-rose-700 shadow-inner">
+          <i data-lucide="sparkles" class="w-6 h-6"></i>
+        </div>
+        <div>
+          <h1 class="text-2xl font-bold font-serif-title tracking-wide text-gray-800">Spa de Damaris Vega</h1>
+          <p class="text-xs text-rose-600 tracking-wider uppercase font-semibold">Sistema de Gestión & Citas</p>
+        </div>
+      </div>
+
+      <div class="flex items-center space-x-3">
+        <!-- Date display -->
+        <div class="hidden md:flex items-center space-x-2 text-xs font-medium text-gray-500 bg-stone-100 px-3 py-1.5 rounded-full border border-stone-200">
+          <i data-lucide="calendar" class="w-4 h-4 text-stone-600"></i>
+          <span id="currentDateDisplay">--/--/----</span>
+        </div>
+        
+        <!-- Today Alert Badge -->
+        <div id="todayAlertBadge" class="flex items-center space-x-2 px-3.5 py-1.5 rounded-full text-xs font-bold bg-amber-50 text-amber-800 border border-amber-200 transition-all">
+          <span class="w-2 h-2 rounded-full bg-amber-500 animate-ping"></span>
+          <span id="todayAlertCount">Cargando citas...</span>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- DAILY ALERT BANNER (COMPUTER NOTIFICATION) -->
+  <div id="alertBanner" class="bg-gradient-to-r from-rose-500 via-rose-600 to-pink-600 text-white shadow-md transition-all">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3 flex flex-col md:flex-row items-center justify-between gap-3">
+      <div class="flex items-center space-x-3">
+        <div class="p-2 bg-white/20 backdrop-blur-md rounded-lg">
+          <i data-lucide="bell-ring" class="w-6 h-6 text-white animate-bounce"></i>
+        </div>
+        <div>
+          <p class="text-xs uppercase tracking-wider text-rose-100 font-bold">¡Recordatorios de Hoy!</p>
+          <p id="alertBannerText" class="text-sm font-medium">Tienes citas programadas para el día de hoy.</p>
+        </div>
+      </div>
+      <div class="flex items-center space-x-2 w-full md:w-auto">
+        <button onclick="scrollToTodayAppointments()" class="flex-1 md:flex-initial px-4 py-1.5 bg-white text-rose-700 hover:bg-rose-50 text-xs font-bold rounded-lg transition-colors shadow-sm flex items-center justify-center space-x-1">
+          <span>Ver Citas de Hoy</span>
+          <i data-lucide="arrow-down" class="w-3.5 h-3.5"></i>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MAIN CONTAINER -->
+  <main class="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-6">
+
+    <!-- NAVIGATION TABS -->
+    <div class="flex flex-wrap gap-2 border-b border-stone-200 pb-2">
+      <button onclick="switchTab('appointments')" id="tab-appointments" class="tab-btn px-5 py-2.5 rounded-xl text-sm font-semibold flex items-center space-x-2 transition-all bg-rose-700 text-white shadow-md">
+        <i data-lucide="calendar" class="w-4 h-4"></i>
+        <span>Agendar y Citas</span>
+      </button>
+      <button onclick="switchTab('services')" id="tab-services" class="tab-btn px-5 py-2.5 rounded-xl text-sm font-semibold flex items-center space-x-2 transition-all text-stone-600 hover:bg-stone-200/60">
+        <i data-lucide="flower-2" class="w-4 h-4"></i>
+        <span>Catálogo de Servicios</span>
+      </button>
+    </div>
+
+    <!-- SECCIÓN: AGENDAR Y CITAS -->
+    <section id="sec-appointments" class="space-y-6">
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+
+        <!-- FORMULARIO DE NUEVA CITA (COL 4) -->
+        <div class="lg:col-span-4 bg-white p-6 rounded-2xl border border-rose-100 shadow-sm space-y-4">
+          <div class="flex items-center space-x-2 border-b border-stone-100 pb-3">
+            <i data-lucide="user-plus" class="w-5 h-5 text-rose-600"></i>
+            <h2 class="text-lg font-bold font-serif-title text-gray-800">Agendar Nueva Cita</h2>
+          </div>
+
+          <form id="appointmentForm" onsubmit="saveAppointment(event)" class="space-y-4">
+            <input type="hidden" id="appId">
+
+            <div>
+              <label class="block text-xs font-semibold text-stone-600 mb-1">Nombre Completo del Cliente *</label>
+              <input type="text" id="clientName" required placeholder="Ej. María García" class="w-full px-3.5 py-2 rounded-xl border border-stone-200 text-sm focus:outline-none focus:ring-2 focus:ring-rose-400">
+            </div>
+
+            <div>
+              <label class="block text-xs font-semibold text-stone-600 mb-1">Teléfono (WhatsApp 10 dígitos) *</label>
+              <input type="tel" id="clientPhone" required placeholder="Ej. 6671234567" pattern="[0-9]{10}" class="w-full px-3.5 py-2 rounded-xl border border-stone-200 text-sm focus:outline-none focus:ring-2 focus:ring-rose-400">
+            </div>
+
+            <div>
+              <label class="block text-xs font-semibold text-stone-600 mb-1">Servicio *</label>
+              <select id="appService" required class="w-full px-3.5 py-2 rounded-xl border border-stone-200 text-sm focus:outline-none focus:ring-2 focus:ring-rose-400 bg-white">
+                <!-- Se llena dinámicamente -->
+              </select>
+            </div>
+
+            <div class="grid grid-cols-2 gap-3">
+              <div>
+                <label class="block text-xs font-semibold text-stone-600 mb-1">Fecha *</label>
+                <input type="date" id="appDate" required class="w-full px-3.5 py-2 rounded-xl border border-stone-200 text-sm focus:outline-none focus:ring-2 focus:ring-rose-400">
+              </div>
+              <div>
+                <label class="block text-xs font-semibold text-stone-600 mb-1">Hora *</label>
+                <input type="time" id="appTime" required class="w-full px-3.5 py-2 rounded-xl border border-stone-200 text-sm focus:outline-none focus:ring-2 focus:ring-rose-400">
+              </div>
+            </div>
+
+            <div class="grid grid-cols-2 gap-3">
+              <div>
+                <label class="block text-xs font-semibold text-stone-600 mb-1">Pago / Anticipo ($) *</label>
+                <input type="number" id="appDeposit" min="0" step="0.01" required placeholder="0.00" class="w-full px-3.5 py-2 rounded-xl border border-stone-200 text-sm focus:outline-none focus:ring-2 focus:ring-rose-400">
+              </div>
+              <div>
+                <label class="block text-xs font-semibold text-stone-600 mb-1">Estado de Pago</label>
+                <select id="appPaymentStatus" class="w-full px-3.5 py-2 rounded-xl border border-stone-200 text-sm focus:outline-none focus:ring-2 focus:ring-rose-400 bg-white">
+                  <option value="Anticipo">Anticipo</option>
+                  <option value="Pagado Completo">Pagado Completo</option>
+                  <option value="Pendiente">Pendiente</option>
+                </select>
+              </div>
+            </div>
+
+            <div>
+              <label class="block text-xs font-semibold text-stone-600 mb-1">Notas adicionales (opcional)</label>
+              <textarea id="appNotes" rows="2" placeholder="Detalles o alergias..." class="w-full px-3.5 py-2 rounded-xl border border-stone-200 text-sm focus:outline-none focus:ring-2 focus:ring-rose-400"></textarea>
+            </div>
+
+            <div class="pt-2 flex space-x-2">
+              <button type="submit" id="btnSubmitApp" class="flex-1 bg-rose-700 hover:bg-rose-800 text-white font-semibold py-2.5 rounded-xl text-sm transition-all shadow-md flex items-center justify-center space-x-2">
+                <i data-lucide="check-circle" class="w-4 h-4"></i>
+                <span>Agendar Cita</span>
+              </button>
+              <button type="button" onclick="resetAppForm()" class="px-3.5 py-2.5 bg-stone-100 hover:bg-stone-200 text-stone-600 rounded-xl text-sm font-semibold transition-all">
+                Limpiar
+              </button>
+            </div>
+          </form>
+        </div>
+
+        <!-- LISTA Y FILTROS DE CITAS (COL 8) -->
+        <div class="lg:col-span-8 space-y-4">
+          <!-- Filtros de búsqueda -->
+          <div class="bg-white p-4 rounded-2xl border border-stone-200/80 shadow-sm flex flex-col sm:flex-row items-center justify-between gap-3">
+            <div class="relative flex-1 w-full">
+              <i data-lucide="search" class="w-4 h-4 text-stone-400 absolute left-3 top-1/2 transform -translate-y-1/2"></i>
+              <input type="text" id="searchApp" oninput="renderAppointments()" placeholder="Buscar cliente o teléfono..." class="w-full pl-9 pr-3 py-2 bg-stone-50 border border-stone-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-rose-400">
+            </div>
+
+            <div class="flex items-center space-x-2 w-full sm:w-auto">
+              <button onclick="setFilterDate('today')" class="px-3 py-1.5 bg-rose-50 text-rose-700 border border-rose-200 text-xs font-bold rounded-lg hover:bg-rose-100 transition-colors">
+                Ver Hoy
+              </button>
+              <button onclick="setFilterDate('all')" class="px-3 py-1.5 bg-stone-100 text-stone-700 border border-stone-200 text-xs font-bold rounded-lg hover:bg-stone-200 transition-colors">
+                Ver Todas
+              </button>
+              <input type="date" id="filterDate" onchange="renderAppointments()" class="px-2.5 py-1 bg-stone-50 border border-stone-200 rounded-lg text-xs focus:outline-none font-medium">
+            </div>
+          </div>
+
+          <!-- Listado de Citas -->
+          <div id="appointmentsList" class="space-y-3">
+            <!-- Renderizado dinámico -->
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- SECCIÓN: GESTIÓN DE SERVICIOS -->
+    <section id="sec-services" class="hidden space-y-6">
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+
+        <!-- Formulario Agregar Servicio -->
+        <div class="lg:col-span-4 bg-white p-6 rounded-2xl border border-rose-100 shadow-sm space-y-4">
+          <div class="flex items-center space-x-2 border-b border-stone-100 pb-3">
+            <i data-lucide="plus-circle" class="w-5 h-5 text-rose-600"></i>
+            <h2 class="text-lg font-bold font-serif-title text-gray-800">Agregar Servicio</h2>
+          </div>
+
+          <form onsubmit="saveService(event)" class="space-y-4">
+            <div>
+              <label class="block text-xs font-semibold text-stone-600 mb-1">Nombre del Servicio *</label>
+              <input type="text" id="serviceName" required placeholder="Ej. Masaje Relajante" class="w-full px-3.5 py-2 rounded-xl border border-stone-200 text-sm focus:outline-none focus:ring-2 focus:ring-rose-400">
+            </div>
+
+            <div class="grid grid-cols-2 gap-3">
+              <div>
+                <label class="block text-xs font-semibold text-stone-600 mb-1">Precio ($) *</label>
+                <input type="number" id="servicePrice" required min="0" step="0.01" placeholder="500" class="w-full px-3.5 py-2 rounded-xl border border-stone-200 text-sm focus:outline-none focus:ring-2 focus:ring-rose-400">
+              </div>
+              <div>
+                <label class="block text-xs font-semibold text-stone-600 mb-1">Duración (min) *</label>
+                <input type="number" id="serviceDuration" required min="1" placeholder="60" class="w-full px-3.5 py-2 rounded-xl border border-stone-200 text-sm focus:outline-none focus:ring-2 focus:ring-rose-400">
+              </div>
+            </div>
+
+            <div>
+              <label class="block text-xs font-semibold text-stone-600 mb-1">Descripción corta</label>
+              <textarea id="serviceDesc" rows="2" placeholder="Detalles de lo que incluye..." class="w-full px-3.5 py-2 rounded-xl border border-stone-200 text-sm focus:outline-none focus:ring-2 focus:ring-rose-400"></textarea>
+            </div>
+
+            <button type="submit" class="w-full bg-rose-700 hover:bg-rose-800 text-white font-semibold py-2.5 rounded-xl text-sm transition-all shadow-md flex items-center justify-center space-x-2">
+              <i data-lucide="save" class="w-4 h-4"></i>
+              <span>Guardar Servicio</span>
+            </button>
+          </form>
+        </div>
+
+        <!-- Lista de Servicios -->
+        <div class="lg:col-span-8">
+          <div class="bg-white p-6 rounded-2xl border border-stone-200/80 shadow-sm space-y-4">
+            <h2 class="text-lg font-bold font-serif-title text-gray-800 border-b border-stone-100 pb-3">Servicios Registrados</h2>
+            <div id="servicesList" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <!-- Renderizado dinámico -->
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+  </main>
+
+  <script>
+    // --- INICIALIZACIÓN DE DATOS DEFAULT ---
+    const defaultServices = [
+      { id: 's1', name: 'Masaje Relajante', price: 450, duration: 60, desc: 'Masaje corporal completo descontracturante y sueco.' },
+      { id: 's2', name: 'Facial Hidratante Profundo', price: 500, duration: 50, desc: 'Limpieza, exfoliación y mascarilla con ácido hialurónico.' },
+      { id: 's3', name: 'Masaje con Piedras Volcánicas', price: 600, duration: 75, desc: 'Terapia térmica relajante muscular profunda.' }
+    ];
+
+    let services = JSON.parse(localStorage.getItem('spa_services')) || defaultServices;
+    let appointments = JSON.parse(localStorage.getItem('spa_appointments')) || [];
+
+    // --- AL CARGAR LA PÁGINA ---
+    document.addEventListener('DOMContentLoaded', () => {
+      lucide.createIcons();
+      setTodayDateHeader();
+      renderServicesSelect();
+      renderServicesList();
+      renderAppointments();
+      checkTodayAlerts();
+    });
+
+    function setTodayDateHeader() {
+      const today = new Date();
+      const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+      document.getElementById('currentDateDisplay').innerText = today.toLocaleDateString('es-ES', options);
+    }
+
+    // --- PESTAÑAS (TABS) ---
+    function switchTab(tab) {
+      document.getElementById('sec-appointments').classList.add('hidden');
+      document.getElementById('sec-services').classList.add('hidden');
+      
+      document.getElementById('tab-appointments').className = "tab-btn px-5 py-2.5 rounded-xl text-sm font-semibold flex items-center space-x-2 transition-all text-stone-600 hover:bg-stone-200/60";
+      document.getElementById('tab-services').className = "tab-btn px-5 py-2.5 rounded-xl text-sm font-semibold flex items-center space-x-2 transition-all text-stone-600 hover:bg-stone-200/60";
+
+      if (tab === 'appointments') {
+        document.getElementById('sec-appointments').classList.remove('hidden');
+        document.getElementById('tab-appointments').className = "tab-btn px-5 py-2.5 rounded-xl text-sm font-semibold flex items-center space-x-2 transition-all bg-rose-700 text-white shadow-md";
+      } else {
+        document.getElementById('sec-services').classList.remove('hidden');
+        document.getElementById('tab-services').className = "tab-btn px-5 py-2.5 rounded-xl text-sm font-semibold flex items-center space-x-2 transition-all bg-rose-700 text-white shadow-md";
+      }
+    }
+
+    // --- GESTIÓN DE SERVICIOS ---
+    function renderServicesSelect() {
+      const select = document.getElementById('appService');
+      select.innerHTML = '<option value="">Selecciona un servicio...</option>';
+      services.forEach(s => {
+        select.innerHTML += `<option value="${s.name}">${s.name} - $${s.price}</option>`;
+      });
+    }
+
+    function renderServicesList() {
+      const container = document.getElementById('servicesList');
+      if (services.length === 0) {
+        container.innerHTML = '<p class="text-xs text-stone-400 col-span-2">No hay servicios registrados.</p>';
+        return;
+      }
+      container.innerHTML = services.map(s => `
+        <div class="p-4 bg-stone-50 rounded-xl border border-stone-200 flex flex-col justify-between">
+          <div>
+            <div class="flex justify-between items-start">
+              <h3 class="font-bold text-gray-800">${s.name}</h3>
+              <span class="text-xs font-bold text-rose-700 bg-rose-100 px-2 py-0.5 rounded-md">$${parseFloat(s.price).toFixed(2)}</span>
+            </div>
+            <p class="text-xs text-stone-500 mt-1">${s.desc || 'Sin descripción'}</p>
+            <p class="text-xs text-stone-400 mt-2 flex items-center"><i data-lucide="clock" class="w-3 h-3 mr-1"></i> ${s.duration} min</p>
+          </div>
+          <div class="mt-3 text-right">
+            <button onclick="deleteService('${s.id}')" class="text-xs text-rose-600 hover:text-rose-800 font-semibold inline-flex items-center">
+              <i data-lucide="trash-2" class="w-3.5 h-3.5 mr-1"></i> Eliminar
+            </button>
+          </div>
+        </div>
+      `).join('');
+      lucide.createIcons();
+    }
+
+    function saveService(e) {
+      e.preventDefault();
+      const name = document.getElementById('serviceName').value.trim();
+      const price = parseFloat(document.getElementById('servicePrice').value);
+      const duration = parseInt(document.getElementById('serviceDuration').value);
+      const desc = document.getElementById('serviceDesc').value.trim();
+
+      const newService = { id: 's_' + Date.now(), name, price, duration, desc };
+      services.push(newService);
+      localStorage.setItem('spa_services', JSON.stringify(services));
+
+      e.target.reset();
+      renderServicesSelect();
+      renderServicesList();
+    }
+
+    function deleteService(id) {
+      if (confirm('¿Deseas eliminar este servicio del catálogo?')) {
+        services = services.filter(s => s.id !== id);
+        localStorage.setItem('spa_services', JSON.stringify(services));
+        renderServicesSelect();
+        renderServicesList();
+      }
+    }
+
+    // --- GESTIÓN DE CITAS ---
+    function saveAppointment(e) {
+      e.preventDefault();
+      const id = document.getElementById('appId').value || 'app_' + Date.now();
+      const name = document.getElementById('clientName').value.trim();
+      const phone = document.getElementById('clientPhone').value.trim();
+      const service = document.getElementById('appService').value;
+      const date = document.getElementById('appDate').value;
+      const time = document.getElementById('appTime').value;
+      const deposit = parseFloat(document.getElementById('appDeposit').value) || 0;
+      const paymentStatus = document.getElementById('appPaymentStatus').value;
+      const notes = document.getElementById('appNotes').value.trim();
+
+      const existingIndex = appointments.findIndex(a => a.id === id);
+      const appData = { id, name, phone, service, date, time, deposit, paymentStatus, notes };
+
+      if (existingIndex >= 0) {
+        appointments[existingIndex] = appData;
+      } else {
+        appointments.push(appData);
+        // Abrir WhatsApp de confirmación inmediata al agendar
+        sendWhatsAppConfirmation(appData);
+      }
+
+      localStorage.setItem('spa_appointments', JSON.stringify(appointments));
+      resetAppForm();
+      renderAppointments();
+      checkTodayAlerts();
+    }
+
+    function resetAppForm() {
+      document.getElementById('appId').value = '';
+      document.getElementById('appointmentForm').reset();
+      document.getElementById('btnSubmitApp').querySelector('span').innerText = 'Agendar Cita';
+    }
+
+    function editAppointment(id) {
+      const app = appointments.find(a => a.id === id);
+      if (!app) return;
+
+      document.getElementById('appId').value = app.id;
+      document.getElementById('clientName').value = app.name;
+      document.getElementById('clientPhone').value = app.phone;
+      document.getElementById('appService').value = app.service;
+      document.getElementById('appDate').value = app.date;
+      document.getElementById('appTime').value = app.time;
+      document.getElementById('appDeposit').value = app.deposit;
+      document.getElementById('appPaymentStatus').value = app.paymentStatus;
+      document.getElementById('appNotes').value = app.notes || '';
+
+      document.getElementById('btnSubmitApp').querySelector('span').innerText = 'Actualizar Cita';
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    function deleteAppointment(id) {
+      if (confirm('¿Seguro que deseas eliminar esta cita?')) {
+        appointments = appointments.filter(a => a.id !== id);
+        localStorage.setItem('spa_appointments', JSON.stringify(appointments));
+        renderAppointments();
+        checkTodayAlerts();
+      }
+    }
+
+    function setFilterDate(type) {
+      const input = document.getElementById('filterDate');
+      if (type === 'today') {
+        const today = new Date().toISOString().split('T')[0];
+        input.value = today;
+      } else {
+        input.value = '';
+      }
+      renderAppointments();
+    }
+
+    function renderAppointments() {
+      const container = document.getElementById('appointmentsList');
+      const search = document.getElementById('searchApp').value.toLowerCase();
+      const dateFilter = document.getElementById('filterDate').value;
+
+      const todayStr = new Date().toISOString().split('T')[0];
+
+      let filtered = appointments.filter(a => {
+        const matchSearch = a.name.toLowerCase().includes(search) || a.phone.includes(search);
+        const matchDate = dateFilter ? a.date === dateFilter : true;
+        return matchSearch && matchDate;
+      });
+
+      // Ordenar por fecha y hora
+      filtered.sort((a, b) => (a.date + a.time).localeCompare(b.date + b.time));
+
+      if (filtered.length === 0) {
+        container.innerHTML = `
+          <div class="bg-white p-8 rounded-2xl border border-stone-200 text-center text-stone-400">
+            <i data-lucide="calendar-x" class="w-10 h-10 mx-auto mb-2 opacity-50"></i>
+            <p class="text-sm font-semibold">No hay citas encontradas.</p>
+          </div>
+        `;
+        lucide.createIcons();
+        return;
+      }
+
+      container.innerHTML = filtered.map(a => {
+        const isToday = a.date === todayStr;
+        return `
+          <div class="bg-white p-5 rounded-2xl border ${isToday ? 'border-rose-300 ring-2 ring-rose-100' : 'border-stone-200'} shadow-sm transition-all hover:shadow-md">
+            <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 border-b border-stone-100 pb-3">
+              <div>
+                <div class="flex items-center space-x-2">
+                  <h3 class="font-bold text-gray-800 text-base">${a.name}</h3>
+                  ${isToday ? '<span class="text-[10px] uppercase font-bold tracking-wider px-2 py-0.5 rounded-full bg-rose-600 text-white">HOY</span>' : ''}
+                </div>
+                <p class="text-xs text-stone-500 font-medium">Tel: ${a.phone}</p>
+              </div>
+
+              <div class="flex items-center space-x-2">
+                <button onclick="sendWhatsAppReminder('${a.id}')" class="px-3 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold rounded-lg flex items-center space-x-1 shadow-sm transition-all">
+                  <i data-lucide="message-circle" class="w-3.5 h-3.5"></i>
+                  <span>WhatsApp Recordatorio</span>
+                </button>
+              </div>
+            </div>
+
+            <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 py-3 text-xs">
+              <div>
+                <span class="text-stone-400 block font-medium">Servicio</span>
+                <span class="font-bold text-gray-700">${a.service}</span>
+              </div>
+              <div>
+                <span class="text-stone-400 block font-medium">Fecha & Hora</span>
+                <span class="font-bold text-gray-700">${formatDateDisplay(a.date)} - ${a.time} hs</span>
+              </div>
+              <div>
+                <span class="text-stone-400 block font-medium">Anticipo / Pago</span>
+                <span class="font-bold text-emerald-700">$${parseFloat(a.deposit).toFixed(2)} (${a.paymentStatus})</span>
+              </div>
+              <div>
+                <span class="text-stone-400 block font-medium">Notas</span>
+                <span class="text-stone-600 italic">${a.notes || 'Sin notas'}</span>
+              </div>
+            </div>
+
+            <div class="flex justify-end space-x-3 border-t border-stone-100 pt-2 text-xs">
+              <button onclick="editAppointment('${a.id}')" class="text-stone-600 hover:text-rose-700 font-semibold flex items-center">
+                <i data-lucide="edit-3" class="w-3.5 h-3.5 mr-1"></i> Editar
+              </button>
+              <button onclick="deleteAppointment('${a.id}')" class="text-rose-600 hover:text-rose-800 font-semibold flex items-center">
+                <i data-lucide="trash-2" class="w-3.5 h-3.5 mr-1"></i> Eliminar
+              </button>
+            </div>
+          </div>
+        `;
+      }).join('');
+
+      lucide.createIcons();
+    }
+
+    function formatDateDisplay(dateStr) {
+      if (!dateStr) return '';
+      const parts = dateStr.split('-');
+      return `${parts[2]}/${parts[1]}/${parts[0]}`;
+    }
+
+    // --- ENLACES Y MENSAJES DE WHATSAPP ---
+    function sendWhatsAppConfirmation(app) {
+      const cleanPhone = app.phone.replace(/\D/g, '');
+      const text = `Hola ${app.name}, te confirmamos tu cita en el *Spa de Damaris Vega* para el día *${formatDateDisplay(app.date)}* a las *${app.time} hs* para el servicio: *${app.service}*. Registramos un anticipo/pago de *$${app.deposit}*. ¡Te esperamos! ✨`;
+      const url = `https://wa.me/52${cleanPhone}?text=${encodeURIComponent(text)}`;
+      window.open(url, '_blank');
+    }
+
+    function sendWhatsAppReminder(id) {
+      const app = appointments.find(a => a.id === id);
+      if (!app) return;
+      const cleanPhone = app.phone.replace(/\D/g, '');
+      const text = `Hola ${app.name}, te hablamos del *Spa de Damaris Vega* para recordarte que tienes una cita el día de hoy (*${formatDateDisplay(app.date)}*) a las *${app.time} hs* para tu servicio de *${app.service}*. ¡Te esperamos con mucho gusto! 🌿✨`;
+      const url = `https://wa.me/52${cleanPhone}?text=${encodeURIComponent(text)}`;
+      window.open(url, '_blank');
+    }
+
+    // --- SISTEMA DE ALERTAS PARA LA COMPUTADORA ---
+    function checkTodayAlerts() {
+      const todayStr = new Date().toISOString().split('T')[0];
+      const todayApps = appointments.filter(a => a.date === todayStr);
+
+      const alertBadge = document.getElementById('todayAlertBadge');
+      const alertBanner = document.getElementById('alertBanner');
+      const alertCount = document.getElementById('todayAlertCount');
+      const bannerText = document.getElementById('alertBannerText');
+
+      if (todayApps.length > 0) {
+        alertCount.innerText = `${todayApps.length} Cita(s) Hoy`;
+        bannerText.innerText = `Tienes ${todayApps.length} persona(s) agendada(s) para hoy. Haz clic para enviarles su recordatorio de WhatsApp.`;
+        alertBanner.classList.remove('hidden');
+        alertBadge.className = "flex items-center space-x-2 px-3.5 py-1.5 rounded-full text-xs font-bold bg-rose-100 text-rose-800 border border-rose-300";
+      } else {
+        alertCount.innerText = `Sin citas hoy`;
+        alertBanner.classList.add('hidden');
+        alertBadge.className = "flex items-center space-x-2 px-3.5 py-1.5 rounded-full text-xs font-bold bg-stone-100 text-stone-600 border border-stone-200";
+      }
+    }
+
+    function scrollToTodayAppointments() {
+      setFilterDate('today');
+      window.scrollTo({ top: 300, behavior: 'smooth' });
+    }
+  </script>
+</body>
+</html>
