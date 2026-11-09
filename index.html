@@ -8,7 +8,7 @@
   <!-- Configuración PWA (Aplicación Instalable) -->
   <link rel="manifest" href="manifest.json">
   <meta name="theme-color" content="#F59E0B">
-  <link rel="apple-touch-icon" href="https://cdn-icons-png.flaticon.com/512/3175/3175155.png">
+  <link rel="apple-touch-icon" href="./logo.png">
 
   <!-- Tailwind CSS CDN -->
   <script src="https://cdn.tailwindcss.com"></script>
@@ -103,9 +103,7 @@
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between">
       
       <div class="flex items-center space-x-3">
-        <div class="w-12 h-12 rounded-full bg-yellow-300 border-2 border-amber-600 flex items-center justify-center shadow-md p-1.5">
-          <i data-lucide="sun" class="w-7 h-7 text-amber-800"></i>
-        </div>
+        <img src="./logo.png" alt="Logo Spa" class="w-12 h-12 rounded-full border-2 border-amber-600 shadow-md object-cover bg-yellow-200">
         <div>
           <h1 class="text-xl md:text-2xl font-bold font-serif-title tracking-wide flex items-center gap-2">
             Spa de Damaris Vega 🌻
@@ -623,17 +621,6 @@
           checkAdminAlerts();
         });
 
-        // Evento específico para notificación flotante de nueva cita
-        dbRefCitas.on('child_added', (snapshot) => {
-          const newApp = snapshot.val();
-          if (newApp && !window._initialLoadDone) {
-            // Evita disparar audio masivo al cargar la página por primera vez
-            return;
-          }
-        });
-
-        setTimeout(() => { window._initialLoadDone = true; }, 1500);
-
         // 2. Cuentas de pago en tiempo real
         const dbRefCuentas = firebase.database().ref('cuentas');
         dbRefCuentas.on('value', (snapshot) => {
@@ -664,39 +651,6 @@
           renderClientCatalog();
           renderAdminServicesList();
         });
-      }
-    }
-
-    function triggerRealtimePopup(app) {
-      try {
-        const audio = new Audio('https://assets.mixkit.co/active_storage/sfx/2869/2869-preview.mp3');
-        audio.play().catch(()=>{});
-      } catch(e){}
-
-      const parts = app.date.split('-');
-      const formattedDate = `${parts[2]}/${parts[1]}/${parts[0]}`;
-
-      document.getElementById('rtNotifDetails').innerText = `${app.name} agendó "${app.service}" para el ${formattedDate} a las ${app.time} hs.`;
-      
-      const notif = document.getElementById('realtimeNotification');
-      const currentScroll = window.scrollY;
-      const windowHeight = window.innerHeight;
-      const topPos = currentScroll + (windowHeight / 2) - 80;
-      
-      notif.style.top = `${topPos}px`;
-      notif.classList.remove('hidden');
-    }
-
-    function closeRealtimeNotif() {
-      document.getElementById('realtimeNotification').classList.add('hidden');
-    }
-
-    function goToNewAppointment() {
-      closeRealtimeNotif();
-      if (!isAdminLoggedIn) {
-        toggleAdminAuth();
-      } else {
-        switchTab('admin-appointments');
       }
     }
 
