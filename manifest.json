@@ -8,7 +8,7 @@
   "description": "Aplicación de gestión de citas y servicios para el Spa de Damaris Vega",
   "icons": [
     {
-      "src": "https://cdn-icons-png.flaticon.com/512/3175/3175155.png",
+      "src": "./logo.png",
       "sizes": "512x512",
       "type": "image/png",
       "purpose": "any maskable"
