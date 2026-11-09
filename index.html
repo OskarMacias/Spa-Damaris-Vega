@@ -76,24 +76,24 @@
     📋 ¡Número copiado al portapapeles!
   </div>
 
-  <!-- AVISO EN TIEMPO REAL CENTRADO -->
-  <div id="realtimeNotification" class="hidden absolute left-1/2 transform -translate-x-1/2 z-50 w-[92%] max-w-md bg-amber-500 text-amber-950 p-4 rounded-2xl shadow-2xl border-2 border-amber-600 animate-pop-in">
+  <!-- AVISO EN TIEMPO REAL CENTRADO CON SONIDO Y ALERTA VISUAL -->
+  <div id="realtimeNotification" class="hidden fixed top-24 left-1/2 transform -translate-x-1/2 z-50 w-[92%] max-w-md bg-amber-500 text-amber-950 p-5 rounded-2xl shadow-2xl border-4 border-amber-700 animate-pop-in">
     <div class="flex items-start justify-between gap-3">
       <div class="flex items-start space-x-3">
-        <div class="p-2 bg-yellow-300 rounded-xl text-amber-950 border border-amber-600">
-          <i data-lucide="bell" class="w-6 h-6 animate-bounce"></i>
+        <div class="p-2.5 bg-yellow-300 rounded-xl text-amber-950 border border-amber-700 shadow">
+          <i data-lucide="bell-ring" class="w-7 h-7 animate-bounce"></i>
         </div>
         <div class="space-y-1">
           <p class="text-xs font-black uppercase tracking-wider text-amber-950">🔔 ¡NUEVA CITA AGENDADA!</p>
-          <p id="rtNotifDetails" class="text-xs font-bold text-amber-950">Cargando detalles...</p>
+          <p id="rtNotifDetails" class="text-xs font-bold text-amber-950 leading-relaxed">Cargando detalles...</p>
         </div>
       </div>
-      <button onclick="closeRealtimeNotif()" class="text-amber-950 hover:text-amber-900 p-1">
-        <i data-lucide="x" class="w-5 h-5"></i>
+      <button onclick="closeRealtimeNotif()" class="text-amber-950 hover:text-amber-900 p-1 font-bold">
+        <i data-lucide="x" class="w-6 h-6"></i>
       </button>
     </div>
-    <button onclick="goToNewAppointment()" class="mt-3 w-full bg-amber-950 text-yellow-300 hover:bg-amber-900 py-2 rounded-xl text-xs font-extrabold flex items-center justify-center space-x-1.5 shadow-md">
-      <span>Presiona aquí para visualizar la cita</span>
+    <button onclick="goToNewAppointment()" class="mt-4 w-full bg-amber-950 text-yellow-300 hover:bg-amber-900 py-2.5 rounded-xl text-xs font-extrabold flex items-center justify-center space-x-1.5 shadow-md border border-amber-800">
+      <span>Revisar Cita en el Panel</span>
       <i data-lucide="arrow-right" class="w-4 h-4"></i>
     </button>
   </div>
@@ -580,6 +580,8 @@
     let adminPassword = localStorage.getItem('spa_admin_pass') || '1234';
     let isAdminLoggedIn = localStorage.getItem('spa_admin_session') === 'true';
     let currentAdminFilter = 'all';
+    let initialAppointmentsLoaded = false;
+    let latestNewAppId = null;
 
     document.addEventListener('DOMContentLoaded', () => {
       lucide.createIcons();
@@ -607,14 +609,48 @@
       }
     }
 
+    // AUDIO DE ALERTA GENERADO POR SINTETIZADOR WEB (NO REQUIERE ARCHIVOS EXTERNOS)
+    function playBeepSound() {
+      try {
+        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        const oscillator = audioCtx.createOscillator();
+        const gainNode = audioCtx.createGain();
+
+        oscillator.type = 'sine';
+        oscillator.frequency.setValueAtTime(880, audioCtx.currentTime); // Tono agudo de notificación
+        gainNode.gain.setValueAtTime(0.1, audioCtx.currentTime);
+
+        oscillator.connect(gainNode);
+        gainNode.connect(audioCtx.destination);
+
+        oscillator.start();
+        oscillator.stop(audioCtx.currentTime + 0.4);
+      } catch (e) {
+        console.log("Audio no permitido aún por políticas del navegador.", e);
+      }
+    }
+
     // LISTENER EN TIEMPO REAL (CITAS, CUENTAS Y SERVICIOS DESDE FIREBASE)
     function initRealtimeListener() {
       if (isFirebaseActive && firebase.database) {
-        // 1. Citas en tiempo real
+        // 1. Citas en tiempo real con detección de nueva cita
         const dbRefCitas = firebase.database().ref('citas');
         dbRefCitas.on('value', (snapshot) => {
           const data = snapshot.val();
-          appointments = data ? Object.values(data) : [];
+          const newApps = data ? Object.values(data) : [];
+
+          if (initialAppointmentsLoaded && newApps.length > appointments.length) {
+            // Se detectó una nueva cita añadida
+            const latest = newApps[newApps.length - 1];
+            latestNewAppId = latest.id;
+            
+            // Disparar sonido y alerta visual
+            playBeepSound();
+            showRealtimePopup(latest);
+          }
+
+          appointments = newApps;
+          initialAppointmentsLoaded = true;
           localStorage.setItem('spa_appointments', JSON.stringify(appointments));
           renderAdminAppointments();
           renderAdminClientsList();
@@ -651,6 +687,35 @@
           renderClientCatalog();
           renderAdminServicesList();
         });
+      }
+    }
+
+    function showRealtimePopup(app) {
+      const banner = document.getElementById('realtimeNotification');
+      const details = document.getElementById('rtNotifDetails');
+      const parts = app.date.split('-');
+      const formattedDate = `${parts[2]}/${parts[1]}/${parts[0]}`;
+
+      details.innerHTML = `<strong>${app.name}</strong> apartó <em>${app.service}</em> para el día ${formattedDate} a las ${app.time} hrs.`;
+      banner.classList.remove('hidden');
+    }
+
+    function closeRealtimeNotif() {
+      document.getElementById('realtimeNotification').classList.add('hidden');
+    }
+
+    function goToNewAppointment() {
+      closeRealtimeNotif();
+      if (!isAdminLoggedIn) {
+        const pass = prompt('Ingresa la contraseña de Administrador para ver las citas:');
+        if (pass === adminPassword) {
+          isAdminLoggedIn = true;
+          localStorage.setItem('spa_admin_session', 'true');
+          checkPersistentSession();
+          switchTab('admin-appointments');
+        }
+      } else {
+        switchTab('admin-appointments');
       }
     }
 
@@ -1105,13 +1170,15 @@
       container.innerHTML = filtered.map(a => {
         const isToday = a.date === todayStr;
         const isConfirmed = a.paymentStatus === 'Anticipo' || a.paymentStatus === 'Pagado Completo' || a.deposit > 0;
+        const isNewHighlight = a.id === latestNewAppId;
 
         return `
-          <div class="bg-white/95 backdrop-blur-md p-5 rounded-2xl border ${isToday ? 'border-amber-500 ring-2 ring-amber-400' : 'border-amber-200'} shadow-md space-y-3">
+          <div class="bg-white/95 backdrop-blur-md p-5 rounded-2xl border ${isNewHighlight ? 'border-amber-600 ring-4 ring-amber-400' : isToday ? 'border-amber-500 ring-2 ring-amber-400' : 'border-amber-200'} shadow-md space-y-3">
             <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 border-b border-amber-100 pb-3">
               <div>
                 <div class="flex items-center space-x-2">
                   <h3 class="font-bold text-amber-950 text-base">🌻 ${a.name}</h3>
+                  ${isNewHighlight ? '<span class="text-[10px] font-extrabold px-2 py-0.5 rounded-full bg-rose-600 text-white animate-pulse">¡NUEVA!</span>' : ''}
                   ${isToday ? '<span class="text-[10px] font-extrabold px-2 py-0.5 rounded-full bg-amber-500 text-amber-950">HOY</span>' : ''}
                   ${isConfirmed ? '<span class="text-[10px] font-extrabold px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800 border border-emerald-300">CONFIRMADA</span>' : '<span class="text-[10px] font-extrabold px-2 py-0.5 rounded-full bg-amber-100 text-amber-800 border border-amber-300">PENDIENTE</span>'}
                 </div>
