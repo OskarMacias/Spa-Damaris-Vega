@@ -8,7 +8,7 @@
   "description": "Aplicación de gestión de citas y servicios para el Spa de Damaris Vega",
   "icons": [
     {
-      "src": "./logo.png",
+      "src": "https://oskarmacias.github.io/Spa-Damaris-Vega/icon.png",
       "sizes": "512x512",
       "type": "image/png",
       "purpose": "any maskable"
