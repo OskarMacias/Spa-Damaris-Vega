@@ -461,72 +461,33 @@
       </div>
     </section>
 
-    <!-- VISTA ADMIN: CONFIGURACIÓN DE DÍAS Y HORARIOS -->
+    <!-- VISTA ADMIN: CONFIGURACIÓN INDEPENDIENTE DE DÍAS, HORARIOS Y LÍMITE DE CLIENTES -->
     <section id="sec-admin-schedule" class="hidden space-y-6">
-      <div class="max-w-3xl mx-auto bg-yellow-50/95 backdrop-blur-md p-6 rounded-2xl border border-amber-300 shadow-xl space-y-6">
+      <div class="max-w-4xl mx-auto bg-yellow-50/95 backdrop-blur-md p-6 rounded-2xl border border-amber-300 shadow-xl space-y-6">
         <div class="flex items-center space-x-2 border-b border-amber-200 pb-3">
           <i data-lucide="clock" class="w-6 h-6 text-amber-700"></i>
           <div>
-            <h2 class="text-lg font-bold font-serif-title text-amber-950">Configurar Días Laborales y Horarios de Atención ⏰</h2>
-            <p class="text-xs text-amber-900">Elige qué días de la semana abres y cuáles descansas, junto con tu horario general.</p>
+            <h2 class="text-lg font-bold font-serif-title text-amber-950">Configuración Independiente por Día (Horarios y Clientes) ⏰</h2>
+            <p class="text-xs text-amber-900">Define para cada día si abres, a qué hora inicias, a qué hora cierras y cuántos clientes o turnos máximos deseas recibir.</p>
           </div>
         </div>
 
-        <form onsubmit="saveScheduleConfig(event)" class="space-y-5">
-          <div class="space-y-3">
-            <label class="block text-xs font-bold text-amber-950 uppercase tracking-wider">Selecciona los días que laboras:</label>
-            <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 bg-white/90 p-4 rounded-xl border border-amber-300">
-              <label class="flex items-center space-x-2 cursor-pointer font-bold text-xs text-amber-950">
-                <input type="checkbox" name="workDay" value="1" class="w-4 h-4 rounded text-amber-600 focus:ring-amber-500">
-                <span>Lunes</span>
-              </label>
-              <label class="flex items-center space-x-2 cursor-pointer font-bold text-xs text-amber-950">
-                <input type="checkbox" name="workDay" value="2" class="w-4 h-4 rounded text-amber-600 focus:ring-amber-500">
-                <span>Martes</span>
-              </label>
-              <label class="flex items-center space-x-2 cursor-pointer font-bold text-xs text-amber-950">
-                <input type="checkbox" name="workDay" value="3" class="w-4 h-4 rounded text-amber-600 focus:ring-amber-500">
-                <span>Miércoles</span>
-              </label>
-              <label class="flex items-center space-x-2 cursor-pointer font-bold text-xs text-amber-950">
-                <input type="checkbox" name="workDay" value="4" class="w-4 h-4 rounded text-amber-600 focus:ring-amber-500">
-                <span>Jueves</span>
-              </label>
-              <label class="flex items-center space-x-2 cursor-pointer font-bold text-xs text-amber-950">
-                <input type="checkbox" name="workDay" value="5" class="w-4 h-4 rounded text-amber-600 focus:ring-amber-500">
-                <span>Viernes</span>
-              </label>
-              <label class="flex items-center space-x-2 cursor-pointer font-bold text-xs text-amber-950">
-                <input type="checkbox" name="workDay" value="6" class="w-4 h-4 rounded text-amber-600 focus:ring-amber-500">
-                <span>Sábado</span>
-              </label>
-              <label class="flex items-center space-x-2 cursor-pointer font-bold text-xs text-amber-950">
-                <input type="checkbox" name="workDay" value="0" class="w-4 h-4 rounded text-amber-600 focus:ring-amber-500">
-                <span>Domingo</span>
-              </label>
-            </div>
-          </div>
-
-          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <div>
-              <label class="block text-xs font-bold text-amber-900 mb-1">Hora de Apertura *</label>
-              <input type="time" id="scheduleStart" required class="w-full px-3.5 py-2 rounded-xl border border-amber-300 text-sm focus:outline-none focus:ring-2 focus:ring-amber-500 bg-white/90 font-bold text-amber-950">
-            </div>
-            <div>
-              <label class="block text-xs font-bold text-amber-900 mb-1">Hora de Cierre *</label>
-              <input type="time" id="scheduleEnd" required class="w-full px-3.5 py-2 rounded-xl border border-amber-300 text-sm focus:outline-none focus:ring-2 focus:ring-amber-500 bg-white/90 font-bold text-amber-950">
+        <form onsubmit="saveScheduleConfig(event)" class="space-y-6">
+          <div class="space-y-4">
+            <div id="daysConfigContainer" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <!-- Se genera dinámicamente cada día de la semana -->
             </div>
           </div>
 
           <button type="submit" class="w-full bg-amber-500 hover:bg-amber-600 text-amber-950 font-bold py-3 rounded-xl text-sm transition-all shadow-md flex items-center justify-center space-x-2 border border-amber-600">
             <i data-lucide="save" class="w-4 h-4"></i>
-            <span>Guardar Horarios y Días de Trabajo</span>
+            <span>Guardar Horarios y Límites por Día</span>
           </button>
         </form>
       </div>
     </section>
 
-    <!-- VISTA NUEVA ADMIN: CONFIGURACIÓN DE WHATSAPP -->
+    <!-- VISTA ADMIN: CONFIGURACIÓN DE WHATSAPP -->
     <section id="sec-admin-whatsapp" class="hidden space-y-6">
       <div class="max-w-md mx-auto bg-yellow-50/95 backdrop-blur-md p-6 rounded-2xl border border-amber-300 shadow-xl space-y-4">
         <div class="flex items-center space-x-2 border-b border-amber-200 pb-3">
@@ -671,14 +632,18 @@
       { id: 'acc2', bank: 'DEPÓSITO EN OXXO / EFECTIVO', owner: 'Damaris Vega', number: 'Tarjeta: 4152 3138 9012 3456', notes: 'Enviar recibo o foto por WhatsApp después de depositar.' }
     ];
 
-    // Configuración de horarios por defecto
-    let workSchedule = JSON.parse(localStorage.getItem('spa_schedule_config')) || {
-      days: ["1", "2", "3", "4", "5", "6"],
-      startTime: "09:00",
-      endTime: "19:00"
+    // Configuración independiente por día por defecto
+    const defaultSchedule = {
+      "1": { active: true, start: "09:00", end: "19:00", maxClients: 5 }, // Lunes
+      "2": { active: true, start: "09:00", end: "19:00", maxClients: 5 }, // Martes
+      "3": { active: true, start: "09:00", end: "19:00", maxClients: 5 }, // Miércoles
+      "4": { active: true, start: "09:00", end: "19:00", maxClients: 5 }, // Jueves
+      "5": { active: true, start: "09:00", end: "19:00", maxClients: 5 }, // Viernes
+      "6": { active: true, start: "09:00", end: "15:00", maxClients: 3 }, // Sábado
+      "0": { active: false, start: "09:00", end: "14:00", maxClients: 2 } // Domingo (Cerrado)
     };
 
-    // Número de WhatsApp configurable (por defecto 6674992354)
+    let workSchedule = JSON.parse(localStorage.getItem('spa_schedule_config')) || defaultSchedule;
     let spaWhatsappNumber = localStorage.getItem('spa_whatsapp_number') || '6674992354';
 
     let services = [];
@@ -742,10 +707,10 @@
       }
     }
 
-    // LISTENER EN TIEMPO REAL (CITAS, CUENTAS, SERVICIOS, HORARIOS Y WHATSAPP DESDE FIREBASE)
+    // LISTENER EN TIEMPO REAL
     function initRealtimeListener() {
       if (isFirebaseActive && firebase.database) {
-        // 1. Citas en tiempo real
+        // 1. Citas
         const dbRefCitas = firebase.database().ref('citas');
         dbRefCitas.on('value', (snapshot) => {
           const data = snapshot.val();
@@ -766,7 +731,7 @@
           checkAdminAlerts();
         });
 
-        // 2. Número de WhatsApp en tiempo real
+        // 2. WhatsApp
         const dbRefWa = firebase.database().ref('configuracion/whatsapp');
         dbRefWa.on('value', (snapshot) => {
           const data = snapshot.val();
@@ -780,7 +745,7 @@
           updateClientWhatsappLinks();
         });
 
-        // 3. Horarios y días laborales
+        // 3. Horarios y días independientes
         const dbRefSchedule = firebase.database().ref('configuracion/horarios');
         dbRefSchedule.on('value', (snapshot) => {
           const data = snapshot.val();
@@ -793,7 +758,7 @@
           loadScheduleConfigToForm();
         });
 
-        // 4. Cuentas de pago en tiempo real
+        // 4. Cuentas de pago
         const dbRefCuentas = firebase.database().ref('cuentas');
         dbRefCuentas.on('value', (snapshot) => {
           const data = snapshot.val();
@@ -808,7 +773,7 @@
           renderAdminAccountsList();
         });
 
-        // 5. Catálogo de Servicios en tiempo real
+        // 5. Servicios
         const dbRefServicios = firebase.database().ref('servicios');
         dbRefServicios.on('value', (snapshot) => {
           const data = snapshot.val();
@@ -886,7 +851,6 @@
       }, 2500);
     }
 
-    // --- MODO ADMIN AUTH & CAMBIO DE CONTRASEÑA ---
     function toggleAdminAuth() {
       const adminTabs = document.querySelectorAll('.admin-only-tab');
 
@@ -959,7 +923,6 @@
       if (activeBtn) activeBtn.className = activeBtn.className.replace('bg-yellow-100/80 text-amber-950 border-amber-300', 'bg-amber-500 text-amber-950 shadow-md border-amber-600');
     }
 
-    // --- CLIENTE: SELECCIÓN MÚLTIPLE Y PAQUETES ---
     function renderClientServicesCheckboxes() {
       const container = document.getElementById('clientServicesCheckboxes');
       if (!container) return;
@@ -1018,7 +981,7 @@
       badge.classList.remove('hidden');
     }
 
-    // --- GENERACIÓN DINÁMICA DE HORARIOS SEGÚN CONFIGURACIÓN ADMIN ---
+    // --- GENERACIÓN DINÁMICA DE HORARIOS SEGÚN CONFIGURACIÓN INDEPENDIENTE DEL DÍA ---
     function updateAvailableHours() {
       const dateInput = document.getElementById('clientDate').value;
       const select = document.getElementById('clientTime');
@@ -1031,15 +994,18 @@
 
       const [year, month, day] = dateInput.split('-').map(Number);
       const selectedDateObj = new Date(year, month - 1, day);
-      const dayOfWeek = selectedDateObj.getDay().toString();
+      const dayOfWeek = selectedDateObj.getDay().toString(); // 0 = Domingo, 1 = Lunes...
 
-      if (!workSchedule.days.includes(dayOfWeek)) {
-        select.innerHTML = '<option value="">❌ Día no laborable / Cerrado</option>';
+      const dayConfig = workSchedule[dayOfWeek];
+
+      if (!dayConfig || !dayConfig.active) {
+        select.innerHTML = '<option value="">❌ Día cerrado / Descanso</option>';
         return;
       }
 
-      let startTime = workSchedule.startTime || "09:00";
-      let endTime = workSchedule.endTime || "19:00";
+      let startTime = dayConfig.start || "09:00";
+      let endTime = dayConfig.end || "19:00";
+      let maxClientsLimit = parseInt(dayConfig.maxClients) || 5;
 
       let generatedSlots = [];
       let [currentHour, currentMinute] = startTime.split(':').map(Number);
@@ -1052,11 +1018,19 @@
         let h = Math.floor(currentTotalMinutes / 60).toString().padStart(2, '0');
         let m = (currentTotalMinutes % 60).toString().padStart(2, '0');
         generatedSlots.push(`${h}:${m}`);
-        currentTotalMinutes += 90;
+        currentTotalMinutes += 90; // Bloques de 1h y media
       }
 
+      // Filtrar horas ya ocupadas en este día
       const bookedHours = appointments.filter(a => a.date === dateInput).map(a => a.time);
-      const free = generatedSlots.filter(t => !bookedHours.includes(t));
+      let free = generatedSlots.filter(t => !bookedHours.includes(t));
+
+      // Limitar según el número máximo de clientes configurado para este día
+      const totalBookedTodayCount = appointments.filter(a => a.date === dateInput).length;
+      if (totalBookedTodayCount >= maxClientsLimit) {
+        select.innerHTML = `<option value="">❌ Límite de ${maxClientsLimit} clientes alcanzado este día</option>`;
+        return;
+      }
 
       if (free.length === 0) {
         select.innerHTML = '<option value="">Sin horarios libres este día</option>';
@@ -1148,6 +1122,19 @@
         return;
       }
 
+      // Validar límite de clientes para este día antes de guardar
+      const [year, month, day] = date.split('-').map(Number);
+      const dayOfWeek = new Date(year, month - 1, day).getDay().toString();
+      const dayConfig = workSchedule[dayOfWeek];
+      if (dayConfig) {
+        const maxLimit = parseInt(dayConfig.maxClients) || 5;
+        const currentCount = appointments.filter(a => a.date === date).length;
+        if (currentCount >= maxLimit) {
+          alert(`Lo sentimos, el día seleccionado ya alcanzó su límite máximo de ${maxLimit} clientes.`);
+          return;
+        }
+      }
+
       let serviceNames = [];
       let totalPrice = 0;
       let minDepositTotal = 0;
@@ -1230,26 +1217,70 @@
       if (input) input.value = spaWhatsappNumber;
     }
 
-    // --- GESTIÓN DE HORARIOS Y DÍAS (ADMIN) ---
+    // --- GESTIÓN INDEPENDIENTE DE DÍAS, HORARIOS Y LÍMITE DE CLIENTES (ADMIN) ---
+    const dayNames = {
+      "1": "Lunes",
+      "2": "Martes",
+      "3": "Miércoles",
+      "4": "Jueves",
+      "5": "Viernes",
+      "6": "Sábado",
+      "0": "Domingo"
+    };
+
+    function loadScheduleConfigToForm() {
+      const container = document.getElementById('daysConfigContainer');
+      if (!container) return;
+
+      // Orden de los días de la semana (Lunes a Domingo)
+      const weekOrder = ["1", "2", "3", "4", "5", "6", "0"];
+
+      container.innerHTML = weekOrder.map(dKey => {
+        const conf = workSchedule[dKey] || { active: true, start: "09:00", end: "19:00", maxClients: 5 };
+        return `
+          <div class="bg-white/90 p-4 rounded-xl border border-amber-300 shadow-sm space-y-3">
+            <div class="flex items-center justify-between border-b border-amber-200 pb-2">
+              <span class="font-bold text-amber-950 text-sm flex items-center gap-1">🌻 ${dayNames[dKey]}</span>
+              <label class="flex items-center space-x-1.5 cursor-pointer text-xs font-bold text-amber-900">
+                <input type="checkbox" id="day_active_${dKey}" ${conf.active ? 'checked' : ''} class="w-4 h-4 rounded text-amber-600 focus:ring-amber-500">
+                <span>¿Abierto este día?</span>
+              </label>
+            </div>
+
+            <div class="grid grid-cols-3 gap-2 text-xs">
+              <div>
+                <label class="block font-bold text-amber-900 mb-0.5">Apertura</label>
+                <input type="time" id="day_start_${dKey}" value="${conf.start || '09:00'}" class="w-full p-1.5 rounded-lg border border-amber-300 bg-white font-bold text-amber-950">
+              </div>
+              <div>
+                <label class="block font-bold text-amber-900 mb-0.5">Cierre</label>
+                <input type="time" id="day_end_${dKey}" value="${conf.end || '19:00'}" class="w-full p-1.5 rounded-lg border border-amber-300 bg-white font-bold text-amber-950">
+              </div>
+              <div>
+                <label class="block font-bold text-amber-900 mb-0.5" title="Máximo de clientes o turnos en el día">Max Clientes</label>
+                <input type="number" min="1" max="20" id="day_max_${dKey}" value="${conf.maxClients || 5}" class="w-full p-1.5 rounded-lg border border-amber-300 bg-white font-bold text-amber-950">
+              </div>
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
     function saveScheduleConfig(e) {
       e.preventDefault();
-      const checkboxes = document.querySelectorAll('input[name="workDay"]:checked');
-      let selectedDays = [];
-      checkboxes.forEach(chk => selectedDays.push(chk.value));
+      const weekOrder = ["1", "2", "3", "4", "5", "6", "0"];
+      let newSchedule = {};
 
-      if (selectedDays.length === 0) {
-        alert('Debes seleccionar al menos un día laboral.');
-        return;
-      }
+      weekOrder.forEach(dKey => {
+        const active = document.getElementById(`day_active_${dKey}`).checked;
+        const start = document.getElementById(`day_start_${dKey}`).value;
+        const end = document.getElementById(`day_end_${dKey}`).value;
+        const maxClients = parseInt(document.getElementById(`day_max_${dKey}`).value) || 5;
 
-      const startTime = document.getElementById('scheduleStart').value;
-      const endTime = document.getElementById('scheduleEnd').value;
+        newSchedule[dKey] = { active, start, end, maxClients };
+      });
 
-      workSchedule = {
-        days: selectedDays,
-        startTime: startTime,
-        endTime: endTime
-      };
+      workSchedule = newSchedule;
 
       if (isFirebaseActive && firebase.database) {
         firebase.database().ref('configuracion/horarios').set(workSchedule);
@@ -1257,19 +1288,7 @@
         localStorage.setItem('spa_schedule_config', JSON.stringify(workSchedule));
       }
 
-      alert('¡Días laborales y horarios actualizados con éxito!');
-    }
-
-    function loadScheduleConfigToForm() {
-      const checkboxes = document.querySelectorAll('input[name="workDay"]');
-      checkboxes.forEach(chk => {
-        chk.checked = workSchedule.days.includes(chk.value);
-      });
-
-      const startInput = document.getElementById('scheduleStart');
-      const endInput = document.getElementById('scheduleEnd');
-      if (startInput) startInput.value = workSchedule.startTime || "09:00";
-      if (endInput) endInput.value = workSchedule.endTime || "19:00";
+      alert('¡Configuración de días, horarios y límite de clientes actualizada con éxito!');
     }
 
     // --- BASE DE DATOS DE CLIENTES E HISTORIAL ---
@@ -1350,7 +1369,6 @@
       lucide.createIcons();
     }
 
-    // --- ADMINISTRADOR ---
     function setFilterStatus(statusType) {
       currentAdminFilter = statusType;
       
@@ -1516,7 +1534,6 @@
       }
     }
 
-    // --- GESTIÓN Y EDICIÓN DE SERVICIOS Y PROMOCIONES ---
     function renderAdminServicesList() {
       const container = document.getElementById('adminServicesList');
       if (!container) return;
@@ -1611,10 +1628,9 @@
       const comboInput = document.getElementById('comboDiscount');
       const bannerInput = document.getElementById('promoBannerText');
       if (comboInput) comboInput.value = promoConfig.comboDiscount || '';
-      if (bannerInput) bannerInput.value = promoConfig.bannerText || '';
+      if (bannerInput) bannerInput.value = promoConfig.promoBannerText || promoConfig.bannerText || '';
     }
 
-    // --- CUENTAS ADMIN ---
     function renderAdminAccountsList() {
       const container = document.getElementById('adminAccountsList');
       if (!container) return;
@@ -1657,7 +1673,7 @@
     }
 
     function deletePaymentAccount(id) {
-      if (confirm('¿Deseas eliminar esta cuenta de pago?')) {
+      if (confirm('¿Deseas deseas eliminar esta cuenta de pago?')) {
         if (isFirebaseActive && firebase.database) {
           firebase.database().ref('cuentas/' + id).remove();
         }
