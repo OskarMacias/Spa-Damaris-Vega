@@ -186,6 +186,16 @@
         <span>⚙️ Servicios y Promos</span>
       </button>
 
+      <button onclick="switchTab('admin-schedule')" id="tab-admin-schedule" class="admin-only-tab tab-btn px-4 py-2 rounded-xl text-xs sm:text-sm font-bold flex items-center space-x-2 transition-all text-amber-950 bg-yellow-100/80 hover:bg-amber-200 border border-amber-300">
+        <i data-lucide="clock" class="w-4 h-4 text-amber-800"></i>
+        <span>⏰ Horarios y Días</span>
+      </button>
+
+      <button onclick="switchTab('admin-whatsapp')" id="tab-admin-whatsapp" class="admin-only-tab tab-btn px-4 py-2 rounded-xl text-xs sm:text-sm font-bold flex items-center space-x-2 transition-all text-amber-950 bg-yellow-100/80 hover:bg-amber-200 border border-amber-300">
+        <i data-lucide="message-square" class="w-4 h-4 text-emerald-700"></i>
+        <span>📱 WhatsApp</span>
+      </button>
+
       <button onclick="switchTab('admin-payment-config')" id="tab-admin-payment-config" class="admin-only-tab tab-btn px-4 py-2 rounded-xl text-xs sm:text-sm font-bold flex items-center space-x-2 transition-all text-amber-950 bg-yellow-100/80 hover:bg-amber-200 border border-amber-300">
         <i data-lucide="wallet" class="w-4 h-4 text-amber-800"></i>
         <span>💳 Configurar Cuentas</span>
@@ -314,7 +324,7 @@
         <div class="bg-amber-100/90 p-4 rounded-xl border border-amber-300 text-xs text-amber-950 space-y-2">
           <p class="font-bold flex items-center gap-1"><span>📲</span> Envío de Comprobante:</p>
           <p>Una vez realizado tu anticipo, por favor presiona el botón de abajo para enviar la captura del comprobante por WhatsApp.</p>
-          <a href="https://wa.me/526674992354?text=Hola,%20adjunto%20mi%20comprobante%20de%20pago." target="_blank" class="inline-flex items-center space-x-2 bg-emerald-600 hover:bg-emerald-700 text-white font-bold px-4 py-2 rounded-xl text-xs shadow-md transition-colors">
+          <a id="clientWhatsappReceiptBtn" href="https://wa.me/526674992354?text=Hola,%20adjunto%20mi%20comprobante%20de%20pago." target="_blank" class="inline-flex items-center space-x-2 bg-emerald-600 hover:bg-emerald-700 text-white font-bold px-4 py-2 rounded-xl text-xs shadow-md transition-colors">
             <i data-lucide="message-circle" class="w-4 h-4"></i>
             <span>Enviar Comprobante por WhatsApp</span>
           </a>
@@ -337,7 +347,7 @@
           <button id="btnFilterAll" onclick="setFilterStatus('all')" class="px-3 py-1.5 bg-amber-500 text-amber-950 font-bold text-xs rounded-lg border border-amber-600 transition-all">Todas</button>
           <button id="btnFilterToday" onclick="setFilterStatus('today')" class="px-3 py-1.5 bg-yellow-200 text-amber-950 font-bold text-xs rounded-lg border border-amber-300 hover:bg-yellow-300 transition-all">🌻 Citas de Hoy</button>
           <button id="btnFilterConfirmed" onclick="setFilterStatus('confirmed')" class="px-3 py-1.5 bg-emerald-100 text-emerald-950 font-bold text-xs rounded-lg border border-emerald-300 hover:bg-emerald-200 transition-all">✅ Confirmadas</button>
-          <button id="btnFilterPending" onclick="setFilterStatus('pending')" class="px-3 py-1.5 bg-amber-100 text-amber-900 font-bold text-xs rounded-lg border border-amber-300 hover:bg-amber-200 transition-all">⏳ Pendientes</button>
+          <button id="btnFilterPending" onclick="setFilterStatus('pending')" class="px-3 py-1.5 bg-amber-100 text-amber-900 font-bold text-xs rounded-lg border border-amber-300 hover:bg-emerald-200 transition-all">⏳ Pendientes</button>
         </div>
       </div>
 
@@ -448,6 +458,97 @@
           </div>
         </div>
 
+      </div>
+    </section>
+
+    <!-- VISTA ADMIN: CONFIGURACIÓN DE DÍAS Y HORARIOS -->
+    <section id="sec-admin-schedule" class="hidden space-y-6">
+      <div class="max-w-3xl mx-auto bg-yellow-50/95 backdrop-blur-md p-6 rounded-2xl border border-amber-300 shadow-xl space-y-6">
+        <div class="flex items-center space-x-2 border-b border-amber-200 pb-3">
+          <i data-lucide="clock" class="w-6 h-6 text-amber-700"></i>
+          <div>
+            <h2 class="text-lg font-bold font-serif-title text-amber-950">Configurar Días Laborales y Horarios de Atención ⏰</h2>
+            <p class="text-xs text-amber-900">Elige qué días de la semana abres y cuáles descansas, junto con tu horario general.</p>
+          </div>
+        </div>
+
+        <form onsubmit="saveScheduleConfig(event)" class="space-y-5">
+          <div class="space-y-3">
+            <label class="block text-xs font-bold text-amber-950 uppercase tracking-wider">Selecciona los días que laboras:</label>
+            <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 bg-white/90 p-4 rounded-xl border border-amber-300">
+              <label class="flex items-center space-x-2 cursor-pointer font-bold text-xs text-amber-950">
+                <input type="checkbox" name="workDay" value="1" class="w-4 h-4 rounded text-amber-600 focus:ring-amber-500">
+                <span>Lunes</span>
+              </label>
+              <label class="flex items-center space-x-2 cursor-pointer font-bold text-xs text-amber-950">
+                <input type="checkbox" name="workDay" value="2" class="w-4 h-4 rounded text-amber-600 focus:ring-amber-500">
+                <span>Martes</span>
+              </label>
+              <label class="flex items-center space-x-2 cursor-pointer font-bold text-xs text-amber-950">
+                <input type="checkbox" name="workDay" value="3" class="w-4 h-4 rounded text-amber-600 focus:ring-amber-500">
+                <span>Miércoles</span>
+              </label>
+              <label class="flex items-center space-x-2 cursor-pointer font-bold text-xs text-amber-950">
+                <input type="checkbox" name="workDay" value="4" class="w-4 h-4 rounded text-amber-600 focus:ring-amber-500">
+                <span>Jueves</span>
+              </label>
+              <label class="flex items-center space-x-2 cursor-pointer font-bold text-xs text-amber-950">
+                <input type="checkbox" name="workDay" value="5" class="w-4 h-4 rounded text-amber-600 focus:ring-amber-500">
+                <span>Viernes</span>
+              </label>
+              <label class="flex items-center space-x-2 cursor-pointer font-bold text-xs text-amber-950">
+                <input type="checkbox" name="workDay" value="6" class="w-4 h-4 rounded text-amber-600 focus:ring-amber-500">
+                <span>Sábado</span>
+              </label>
+              <label class="flex items-center space-x-2 cursor-pointer font-bold text-xs text-amber-950">
+                <input type="checkbox" name="workDay" value="0" class="w-4 h-4 rounded text-amber-600 focus:ring-amber-500">
+                <span>Domingo</span>
+              </label>
+            </div>
+          </div>
+
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div>
+              <label class="block text-xs font-bold text-amber-900 mb-1">Hora de Apertura *</label>
+              <input type="time" id="scheduleStart" required class="w-full px-3.5 py-2 rounded-xl border border-amber-300 text-sm focus:outline-none focus:ring-2 focus:ring-amber-500 bg-white/90 font-bold text-amber-950">
+            </div>
+            <div>
+              <label class="block text-xs font-bold text-amber-900 mb-1">Hora de Cierre *</label>
+              <input type="time" id="scheduleEnd" required class="w-full px-3.5 py-2 rounded-xl border border-amber-300 text-sm focus:outline-none focus:ring-2 focus:ring-amber-500 bg-white/90 font-bold text-amber-950">
+            </div>
+          </div>
+
+          <button type="submit" class="w-full bg-amber-500 hover:bg-amber-600 text-amber-950 font-bold py-3 rounded-xl text-sm transition-all shadow-md flex items-center justify-center space-x-2 border border-amber-600">
+            <i data-lucide="save" class="w-4 h-4"></i>
+            <span>Guardar Horarios y Días de Trabajo</span>
+          </button>
+        </form>
+      </div>
+    </section>
+
+    <!-- VISTA NUEVA ADMIN: CONFIGURACIÓN DE WHATSAPP -->
+    <section id="sec-admin-whatsapp" class="hidden space-y-6">
+      <div class="max-w-md mx-auto bg-yellow-50/95 backdrop-blur-md p-6 rounded-2xl border border-amber-300 shadow-xl space-y-4">
+        <div class="flex items-center space-x-2 border-b border-amber-200 pb-3">
+          <i data-lucide="message-square" class="w-6 h-6 text-emerald-700"></i>
+          <div>
+            <h2 class="text-lg font-bold font-serif-title text-amber-950">Número de WhatsApp del Spa 📱</h2>
+            <p class="text-xs text-amber-900">Define a qué número se redirigirán los mensajes de confirmación de citas.</p>
+          </div>
+        </div>
+
+        <form onsubmit="saveWhatsappConfig(event)" class="space-y-4">
+          <div>
+            <label class="block text-xs font-bold text-amber-900 mb-1">Número de WhatsApp (10 dígitos o con lada) *</label>
+            <input type="text" id="adminWhatsappInput" required placeholder="Ej. 6674992354" class="w-full px-3.5 py-2 rounded-xl border border-amber-300 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500 bg-white/90 font-bold text-amber-950">
+            <p class="text-[11px] text-stone-600 mt-1">Ingresa el número a 10 dígitos (por defecto se antepondrá la lada de México +52).</p>
+          </div>
+
+          <button type="submit" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-3 rounded-xl text-sm transition-all shadow-md flex items-center justify-center space-x-2 border border-emerald-700">
+            <i data-lucide="save" class="w-4 h-4"></i>
+            <span>Guardar Número de WhatsApp</span>
+          </button>
+        </form>
       </div>
     </section>
 
@@ -570,7 +671,15 @@
       { id: 'acc2', bank: 'DEPÓSITO EN OXXO / EFECTIVO', owner: 'Damaris Vega', number: 'Tarjeta: 4152 3138 9012 3456', notes: 'Enviar recibo o foto por WhatsApp después de depositar.' }
     ];
 
-    const availableTimeSlots = ["09:00", "10:30", "12:00", "14:00", "15:30", "17:00", "18:30"];
+    // Configuración de horarios por defecto
+    let workSchedule = JSON.parse(localStorage.getItem('spa_schedule_config')) || {
+      days: ["1", "2", "3", "4", "5", "6"],
+      startTime: "09:00",
+      endTime: "19:00"
+    };
+
+    // Número de WhatsApp configurable (por defecto 6674992354)
+    let spaWhatsappNumber = localStorage.getItem('spa_whatsapp_number') || '6674992354';
 
     let services = [];
     let appointments = [];
@@ -588,6 +697,9 @@
       setMinDateToday();
       checkPersistentSession();
       loadPromoConfigToForm();
+      loadScheduleConfigToForm();
+      loadWhatsappConfigToForm();
+      updateClientWhatsappLinks();
       initRealtimeListener();
     });
 
@@ -609,7 +721,7 @@
       }
     }
 
-    // AUDIO DE ALERTA GENERADO POR SINTETIZADOR WEB (NO REQUIERE ARCHIVOS EXTERNOS)
+    // AUDIO DE ALERTA GENERADO POR SINTETIZADOR WEB
     function playBeepSound() {
       try {
         const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
@@ -617,7 +729,7 @@
         const gainNode = audioCtx.createGain();
 
         oscillator.type = 'sine';
-        oscillator.frequency.setValueAtTime(880, audioCtx.currentTime); // Tono agudo de notificación
+        oscillator.frequency.setValueAtTime(880, audioCtx.currentTime);
         gainNode.gain.setValueAtTime(0.1, audioCtx.currentTime);
 
         oscillator.connect(gainNode);
@@ -630,21 +742,18 @@
       }
     }
 
-    // LISTENER EN TIEMPO REAL (CITAS, CUENTAS Y SERVICIOS DESDE FIREBASE)
+    // LISTENER EN TIEMPO REAL (CITAS, CUENTAS, SERVICIOS, HORARIOS Y WHATSAPP DESDE FIREBASE)
     function initRealtimeListener() {
       if (isFirebaseActive && firebase.database) {
-        // 1. Citas en tiempo real con detección de nueva cita
+        // 1. Citas en tiempo real
         const dbRefCitas = firebase.database().ref('citas');
         dbRefCitas.on('value', (snapshot) => {
           const data = snapshot.val();
           const newApps = data ? Object.values(data) : [];
 
           if (initialAppointmentsLoaded && newApps.length > appointments.length) {
-            // Se detectó una nueva cita añadida
             const latest = newApps[newApps.length - 1];
             latestNewAppId = latest.id;
-            
-            // Disparar sonido y alerta visual
             playBeepSound();
             showRealtimePopup(latest);
           }
@@ -657,7 +766,34 @@
           checkAdminAlerts();
         });
 
-        // 2. Cuentas de pago en tiempo real
+        // 2. Número de WhatsApp en tiempo real
+        const dbRefWa = firebase.database().ref('configuracion/whatsapp');
+        dbRefWa.on('value', (snapshot) => {
+          const data = snapshot.val();
+          if (data) {
+            spaWhatsappNumber = data;
+          } else {
+            firebase.database().ref('configuracion/whatsapp').set(spaWhatsappNumber);
+          }
+          localStorage.setItem('spa_whatsapp_number', spaWhatsappNumber);
+          loadWhatsappConfigToForm();
+          updateClientWhatsappLinks();
+        });
+
+        // 3. Horarios y días laborales
+        const dbRefSchedule = firebase.database().ref('configuracion/horarios');
+        dbRefSchedule.on('value', (snapshot) => {
+          const data = snapshot.val();
+          if (data) {
+            workSchedule = data;
+          } else {
+            firebase.database().ref('configuracion/horarios').set(workSchedule);
+          }
+          localStorage.setItem('spa_schedule_config', JSON.stringify(workSchedule));
+          loadScheduleConfigToForm();
+        });
+
+        // 4. Cuentas de pago en tiempo real
         const dbRefCuentas = firebase.database().ref('cuentas');
         dbRefCuentas.on('value', (snapshot) => {
           const data = snapshot.val();
@@ -672,7 +808,7 @@
           renderAdminAccountsList();
         });
 
-        // 3. Catálogo de Servicios en tiempo real
+        // 5. Catálogo de Servicios en tiempo real
         const dbRefServicios = firebase.database().ref('servicios');
         dbRefServicios.on('value', (snapshot) => {
           const data = snapshot.val();
@@ -809,7 +945,7 @@
     }
 
     function switchTab(tabId) {
-      const tabs = ['client-book', 'client-payments', 'admin-appointments', 'admin-clients', 'admin-services', 'admin-payment-config', 'admin-security'];
+      const tabs = ['client-book', 'client-payments', 'admin-appointments', 'admin-clients', 'admin-services', 'admin-schedule', 'admin-whatsapp', 'admin-payment-config', 'admin-security'];
       tabs.forEach(t => {
         const sec = document.getElementById(`sec-${t}`);
         const btn = document.getElementById(`tab-${t}`);
@@ -882,18 +1018,45 @@
       badge.classList.remove('hidden');
     }
 
+    // --- GENERACIÓN DINÁMICA DE HORARIOS SEGÚN CONFIGURACIÓN ADMIN ---
     function updateAvailableHours() {
-      const date = document.getElementById('clientDate').value;
+      const dateInput = document.getElementById('clientDate').value;
       const select = document.getElementById('clientTime');
       select.innerHTML = '';
 
-      if (!date) {
+      if (!dateInput) {
         select.innerHTML = '<option value="">Selecciona fecha primero</option>';
         return;
       }
 
-      const bookedHours = appointments.filter(a => a.date === date).map(a => a.time);
-      const free = availableTimeSlots.filter(t => !bookedHours.includes(t));
+      const [year, month, day] = dateInput.split('-').map(Number);
+      const selectedDateObj = new Date(year, month - 1, day);
+      const dayOfWeek = selectedDateObj.getDay().toString();
+
+      if (!workSchedule.days.includes(dayOfWeek)) {
+        select.innerHTML = '<option value="">❌ Día no laborable / Cerrado</option>';
+        return;
+      }
+
+      let startTime = workSchedule.startTime || "09:00";
+      let endTime = workSchedule.endTime || "19:00";
+
+      let generatedSlots = [];
+      let [currentHour, currentMinute] = startTime.split(':').map(Number);
+      let [endHour, endMinute] = endTime.split(':').map(Number);
+
+      let currentTotalMinutes = currentHour * 60 + currentMinute;
+      let endTotalMinutes = endHour * 60 + endMinute;
+
+      while (currentTotalMinutes < endTotalMinutes) {
+        let h = Math.floor(currentTotalMinutes / 60).toString().padStart(2, '0');
+        let m = (currentTotalMinutes % 60).toString().padStart(2, '0');
+        generatedSlots.push(`${h}:${m}`);
+        currentTotalMinutes += 90;
+      }
+
+      const bookedHours = appointments.filter(a => a.date === dateInput).map(a => a.time);
+      const free = generatedSlots.filter(t => !bookedHours.includes(t));
 
       if (free.length === 0) {
         select.innerHTML = '<option value="">Sin horarios libres este día</option>';
@@ -963,6 +1126,14 @@
       lucide.createIcons();
     }
 
+    function updateClientWhatsappLinks() {
+      const cleanWa = spaWhatsappNumber.replace(/\D/g, '');
+      const btnReceipt = document.getElementById('clientWhatsappReceiptBtn');
+      if (btnReceipt) {
+        btnReceipt.href = `https://wa.me/52${cleanWa}?text=Hola,%20adjunto%20mi%20comprobante%20de%20pago.`;
+      }
+    }
+
     function handleClientBooking(e) {
       e.preventDefault();
       const name = document.getElementById('clientName').value.trim();
@@ -1020,7 +1191,8 @@
       const formattedDate = `${parts[2]}/${parts[1]}/${parts[0]}`;
 
       const text = `Hola, mi nombre es *${name}*. Acabo de agendar una cita para: *${serviceCombinedStr}* el día *${formattedDate}* a las *${time} hs*. Quedo a la espera de enviar mi comprobante de anticipo. ✨🌻`;
-      const waUrl = `https://wa.me/526674992354?text=${encodeURIComponent(text)}`;
+      const cleanWa = spaWhatsappNumber.replace(/\D/g, '');
+      const waUrl = `https://wa.me/52${cleanWa}?text=${encodeURIComponent(text)}`;
 
       alert('¡Cita agendada con éxito! Serás redirigido a WhatsApp para confirmar tu anticipo.');
       window.open(waUrl, '_blank');
@@ -1031,6 +1203,73 @@
       renderAdminAppointments();
       renderAdminClientsList();
       checkAdminAlerts();
+    }
+
+    // --- CONFIGURACIÓN DE WHATSAPP (ADMIN) ---
+    function saveWhatsappConfig(e) {
+      e.preventDefault();
+      const newNum = document.getElementById('adminWhatsappInput').value.trim();
+      if (!newNum || newNum.length < 8) {
+        alert('Por favor ingresa un número de teléfono válido.');
+        return;
+      }
+
+      spaWhatsappNumber = newNum;
+      if (isFirebaseActive && firebase.database) {
+        firebase.database().ref('configuracion/whatsapp').set(spaWhatsappNumber);
+      } else {
+        localStorage.setItem('spa_whatsapp_number', spaWhatsappNumber);
+      }
+
+      updateClientWhatsappLinks();
+      alert('¡Número de WhatsApp actualizado con éxito!');
+    }
+
+    function loadWhatsappConfigToForm() {
+      const input = document.getElementById('adminWhatsappInput');
+      if (input) input.value = spaWhatsappNumber;
+    }
+
+    // --- GESTIÓN DE HORARIOS Y DÍAS (ADMIN) ---
+    function saveScheduleConfig(e) {
+      e.preventDefault();
+      const checkboxes = document.querySelectorAll('input[name="workDay"]:checked');
+      let selectedDays = [];
+      checkboxes.forEach(chk => selectedDays.push(chk.value));
+
+      if (selectedDays.length === 0) {
+        alert('Debes seleccionar al menos un día laboral.');
+        return;
+      }
+
+      const startTime = document.getElementById('scheduleStart').value;
+      const endTime = document.getElementById('scheduleEnd').value;
+
+      workSchedule = {
+        days: selectedDays,
+        startTime: startTime,
+        endTime: endTime
+      };
+
+      if (isFirebaseActive && firebase.database) {
+        firebase.database().ref('configuracion/horarios').set(workSchedule);
+      } else {
+        localStorage.setItem('spa_schedule_config', JSON.stringify(workSchedule));
+      }
+
+      alert('¡Días laborales y horarios actualizados con éxito!');
+    }
+
+    function loadScheduleConfigToForm() {
+      const checkboxes = document.querySelectorAll('input[name="workDay"]');
+      checkboxes.forEach(chk => {
+        chk.checked = workSchedule.days.includes(chk.value);
+      });
+
+      const startInput = document.getElementById('scheduleStart');
+      const endInput = document.getElementById('scheduleEnd');
+      if (startInput) startInput.value = workSchedule.startTime || "09:00";
+      if (endInput) endInput.value = workSchedule.endTime || "19:00";
     }
 
     // --- BASE DE DATOS DE CLIENTES E HISTORIAL ---
